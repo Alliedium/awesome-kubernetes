@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: database
+  labels:
+    component: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: db
+  serviceName: database
+  template:
+    metadata:
+      labels:
+        component: db
+    spec:
+      containers:
+        - name: example-api-database
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: password
+            - name: TZ
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: TZ
+            - name: PGTZ
+              value: "$(TZ)"
+          image: postgres:13
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "exec pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "exec pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+            initialDelaySeconds: 45
+            timeoutSeconds: 2
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb-data
+              subPath: postgres
+  volumeClaimTemplates:
+  - metadata:
+      name: postgredb-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

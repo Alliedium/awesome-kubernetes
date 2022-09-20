@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api-pod
+  labels:
+    component: api
+spec:
+  containers:
+    - name: example-api
+      env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: DB_USERNAME
+          value: root
+        - name: DB_PASSWORD
+          value: root
+        - name: DB_URL
+          value: database:5432/example-api
+      image: demo-registry:5000/example-api:0.1.0
+      imagePullPolicy: IfNotPresent
+      command: 
+        - sh
+        - -c
+      args:
+        - "dockerize -wait tcp://database.$(POD_NAMESPACE).svc.cluster.local:5432 -timeout 20s java -jar api.jar"
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"

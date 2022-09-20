@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels:
+    component: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: api
+  template:
+    metadata:
+      labels:
+        component: api
+    spec:
+      containers:
+        - name: example-api
+          envFrom:
+            - configMapRef:
+                name: db-config
+          env:
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: password
+            - name: DB_URL
+              value: $(DB_HOST):$(DB_PORT)/$(DB_NAME)
+          image: demo-registry:5000/example-api:0.1.0
+          imagePullPolicy: IfNotPresent
+          command: 
+            - sh
+            - -c
+          args:
+            - "dockerize -wait tcp://$(DB_HOST):$(DB_PORT) -timeout 20s java -jar api.jar"
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            initialDelaySeconds: 120
+            periodSeconds: 120
+            timeoutSeconds: 15
+            httpGet:
+              path: /
+              port: 80
+          readinessProbe:
+            initialDelaySeconds: 100
+            periodSeconds: 15
+            timeoutSeconds: 15
+            httpGet:
+              path: /
+              port: 80
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"

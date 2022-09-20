@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: database-replicaset
+  labels:
+    component: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: db
+  template:
+    metadata:
+      labels:
+        component: db
+    spec:
+      containers:
+        - name: example-api-database
+          env:
+            - name: POSTGRES_DB
+              value: example-api
+            - name: POSTGRES_USER
+              value: root
+            - name: POSTGRES_PASSWORD
+              value: root
+            - name: TZ
+              value: America/Sao_Paulo
+            - name: PGTZ
+              value: America/Sao_Paulo
+          image: postgres:13
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "exec pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "exec pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+            initialDelaySeconds: 45
+            timeoutSeconds: 2
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb-data
+              subPath: postgres
+      volumes:
+        - name: postgredb-data
+          persistentVolumeClaim:
+            claimName: db-pv-claim

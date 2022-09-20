@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api-pod
+spec:
+  containers:
+    - name: example-api
+      env:
+        - name: DB_USERNAME
+          value: root
+        - name: DB_PASSWORD
+          value: root
+        - name: DB_URL
+          value: 127.0.0.1:5432/example-api
+      image: demo-registry:5000/example-api:0.1.0
+      imagePullPolicy: IfNotPresent
+      command: 
+        - sh
+        - -c
+      args:
+        - "dockerize -wait tcp://127.0.0.1:5432 -timeout 20s java -jar api.jar"
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+    - name: example-api-database
+      env:
+        - name: POSTGRES_DB
+          value: example-api
+        - name: POSTGRES_USER
+          value: root
+        - name: POSTGRES_PASSWORD
+          value: root
+        - name: TZ
+          value: America/Sao_Paulo
+        - name: PGTZ
+          value: America/Sao_Paulo
+      image: postgres:13
+      imagePullPolicy: "IfNotPresent"
+      ports:
+        - containerPort: 5432
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgredb-data
+          subPath: postgres
+  volumes:
+    - name: postgredb-data
+      emptyDir: {}
