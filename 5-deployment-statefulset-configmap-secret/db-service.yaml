@@ -5,6 +5,7 @@ metadata:
   labels:
     component: db
 spec:
+  # ClusterIP is a default value, may be omitted
   type: ClusterIP
   ports:
    - port: 5432

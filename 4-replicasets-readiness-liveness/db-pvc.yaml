@@ -5,6 +5,8 @@ metadata:
   labels:
     component: db
 spec:
+  # there are several access modes: ReadWriteOnce, ReadOnlyMany, ReadWriteMany, ReadWriteOncePod
+  # a volume with ReadWriteOnce can be mounted as a read-write by a single node
   accessModes:
     - ReadWriteOnce
   resources:

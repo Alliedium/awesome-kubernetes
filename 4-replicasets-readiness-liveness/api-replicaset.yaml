@@ -27,12 +27,14 @@ spec:
             - name: DB_PASSWORD
               value: root
             - name: DB_URL
+              # database is a short DNS name of a service, accessible from within the same namespace
               value: database:5432/example-api
           image: demo-registry:5000/example-api:0.1.0
           imagePullPolicy: IfNotPresent
           command: 
             - sh
             - -c
+          # database.$(POD_NAMESPACE).svc.cluster.local is a long DNS name of a service, accessible from all namespaces
           args:
             - "dockerize -wait tcp://database.$(POD_NAMESPACE).svc.cluster.local:5432 -timeout 20s java -jar api.jar"
           ports:

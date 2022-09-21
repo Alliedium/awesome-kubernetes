@@ -16,12 +16,14 @@ spec:
         - name: DB_PASSWORD
           value: root
         - name: DB_URL
+          # <database-pod-ip> should be replaced on pod IP of database pod with dots replaced on dashes
           value: <database-pod-ip>.$(POD_NAMESPACE).pod.cluster.local:5432/example-api
       image: demo-registry:5000/example-api:0.1.0
       imagePullPolicy: IfNotPresent
       command: 
         - sh
         - -c
+      # <database-pod-ip> should be replaced on pod IP of database pod with dots replaced on dashes
       args:
         - "dockerize -wait tcp://<database-pod-ip>.$(POD_NAMESPACE).pod.cluster.local:5432 -timeout 20s java -jar api.jar"
       ports:

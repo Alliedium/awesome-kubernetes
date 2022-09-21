@@ -45,7 +45,6 @@ cd ..
 
 - No persisence, data may be lost!
 - Not scalable, containers may crash with stopping the whole pod
-- Not secure, volume is shared between all containers
 - Not possible to update and restart the app without relaunching database
 - Very unstable way to expose the app and the latter is only to the host
 - Configuration parameters are copy-pasted
