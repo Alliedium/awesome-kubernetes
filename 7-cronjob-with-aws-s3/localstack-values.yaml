@@ -1,0 +1,15 @@
+debug: true
+extraEnvVars:
+  - name: SERVICES
+    value: s3
+  - name: AWS_ACCESS_KEY_ID
+    value: local
+  - name: AWS_SECRET_ACCESS_KEY
+    value: local
+  - name: AWS_DEFAULT_REGION
+    value: us-east-1
+  - name: HOSTNAME_EXTERNAL
+    value: localstack
+enableStartupScripts: true
+startupScriptContent: |
+  awslocal s3 mb s3://backups

@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-backup
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: db-backup
+              envFrom:
+                - configMapRef:
+                    name: db-config
+                - configMapRef:
+                    name: s3-config
+              env:
+                - name: MODE
+                  value: MANUAL
+                - name: MANUAL_RUN_FOREVER
+                  value: "FALSE"
+                - name: CONTAINER_ENABLE_SCHEDULING
+                  value: "FALSE"
+                - name: CONTAINER_ENABLE_MONITORING
+                  value: "FALSE"
+                - name: BACKUP_LOCATION
+                  value: S3
+                - name: S3_PATH
+                  value: ''
+                - name: S3_BUCKET
+                  value: backups
+                - name: S3_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: s3-secret
+                      key: AWS_ACCESS_KEY_ID
+                - name: S3_KEY_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: s3-secret
+                      key: AWS_SECRET_ACCESS_KEY
+                - name: DB_TYPE
+                  value: pgsql
+                - name: DB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-secret
+                      key: username
+                - name: DB_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-secret
+                      key: password
+              image: tiredofit/db-backup:3.4.2
+              command:
+                - backup-now
+          restartPolicy: Never
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1

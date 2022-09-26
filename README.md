@@ -166,7 +166,7 @@ cd ..
 cd ./6-job-with-minio
 kubectl apply -f s3-secret.yaml
 # install Minio via Helm
-helm upgrade --install minio minio --namespace example-api \
+helm upgrade --install minio minio \
   --repo https://charts.min.io \
   --set existingSecret=s3-secret \
   --set mode=standalone --set resources.requests.memory=100Mi \
@@ -188,4 +188,65 @@ kubectl wait --for=condition=complete job/db-backup
 helm delete minio
 kubectl delete -f s3-secret.yaml
 cd ..
+```
+
+## 7. Cron Job with AWS S3 storage
+
+We are using `Localstack` in this example instead of using real AWS S3 storage. But if you wish to use the latter one, please make the following:
+
+* create an AWS account
+* in AWS S3 in some region create a bucket named `backups`
+* in AWS IAM create a user with programmatic access having full access to this bucket
+* change values in `s3-secret.yaml` by real values of `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` taken for this
+* change values in `s3-config.yaml` by the values pointed in comments there
+* omit in the initial actions below installing of Localstack via Helm
+
+### Initial actions
+
+```
+cd ./7-cronjob-with-aws-s3
+kubectl apply -f s3-config.yaml
+kubectl apply -f s3-secret.yaml
+# install Localstack via Helm
+helm upgrade --install localstack localstack --repo https://helm.localstack.cloud -f localstack-values.yaml --set service.type=LoadBalancer
+```
+
+### Deploy Cron job
+
+```
+kubectl apply -f db-backup-cronjob.yaml
+```
+
+### Test Cron job
+
+Either trigger Cron job manually via some tool like OpenLens or execute the following:
+```
+kubectl create job --from=cronjob/db-backup db-backup-manual-$(openssl rand -hex 3)
+```
+
+After this in the case of real AWS execute
+
+```
+aws s3 ls s3://backups --recursive
+
+```
+
+Otherwise, when `Localstack` is used (as is by default here), either create port forwarding for `localstack` service via some tool like OpenLens or execute
+
+```
+kubectl port-forward svc/localstack 4566:4566 &
+disown
+```
+and after this please run
+```
+aws --endpoint http://localhost:4566 s3 ls s3://backups --recursive
+```
+
+### Cleaning actions
+
+```
+helm delete localstack
+kubectl delete -f db-backup-cronjob.yaml
+kubectl delete -f s3-secret.yaml
+kubectl delete -f s3-config.yaml
 ```
