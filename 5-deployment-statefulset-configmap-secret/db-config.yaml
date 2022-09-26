@@ -4,5 +4,6 @@ metadata:
   name: db-config
 data:
   DB_HOST: database
+  DB_PORT: "5432"
   DB_NAME: example-api
   TZ: America/Sao_Paulo

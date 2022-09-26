@@ -20,8 +20,6 @@ spec:
             - configMapRef:
                 name: db-config
           env:
-            - name: DB_PORT
-              value: "5432"
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:

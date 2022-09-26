@@ -53,9 +53,9 @@ spec:
           subPath: postgres
   volumes:
     - name: postgredb-data
-      emptyDir: {}
       #
       # it is possible also to create a RAM volume by the following way:
       #
       # emptyDir:
       #   medium: "Memory"
+      emptyDir: {}

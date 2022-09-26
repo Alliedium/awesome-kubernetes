@@ -28,6 +28,9 @@ Each time it is necessary to remove previous resources to be able to deploy new 
 kubectl delete namespace example-api
 kubectl create namespace example-api
 ```
+This is necessary ONLY for examples 1--5 below concerning deployment variants.
+
+For examples 6 and 7 it is assumed that the example 5 is already deployed, instructions on removing resources concerning examples 6 and 7 are given below along the examples themselves.
 
 # Deployment variants
 
@@ -153,3 +156,36 @@ cd ..
 - Password is in a secret, we have a way to conceal it from some non-admin users (will be discussed later)
 - Persistent volumes per each DB pod
 - It is possible to roll out a new version of the app smoothly
+
+# Backup jobs configuration variants
+
+## 6. Simple job with Minio S3 storage
+
+### Initial actions
+```
+cd ./6-job-with-minio
+kubectl apply -f s3-secret.yaml
+# install Minio via Helm
+helm upgrade --install minio minio --namespace example-api \
+  --repo https://charts.min.io \
+  --set existingSecret=s3-secret \
+  --set mode=standalone --set resources.requests.memory=100Mi \
+  --set persistence.enabled=true \
+  --set persistence.size=1Gi \
+  --set 'buckets[0].name=backups,buckets[0].policy=none,buckets[0].purge=false'
+```
+
+### Launch job and wait for its completion
+
+```
+kubectl apply -f db-backup-job.yaml
+kubectl wait --for=condition=complete job/db-backup
+```
+
+### Cleaning actions
+
+```
+helm delete minio
+kubectl delete -f s3-secret.yaml
+cd ..
+```
