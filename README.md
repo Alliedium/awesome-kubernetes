@@ -137,7 +137,7 @@ cd ..
 
 ```
 cd ./5-deployment-statefulset-configmap-secret
-kubectl apply -f db-config.yaml
+kubectl apply -f db-configmap.yaml
 kubectl apply -f db-secret.yaml
 kubectl apply -f db-service.yaml
 kubectl apply -f api-service.yaml
@@ -197,15 +197,15 @@ We are using `Localstack` in this example instead of using real AWS S3 storage. 
 * create an AWS account
 * in AWS S3 in some region create a bucket named `backups`
 * in AWS IAM create a user with programmatic access having full access to this bucket
-* change values in `s3-secret.yaml` by real values of `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` taken for this
-* change values in `s3-config.yaml` by the values pointed in comments there
+* change values in `s3-secret.yaml` by real values of `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` taken for this user
+* change values in `s3-configmap.yaml` by the values according the comments in that file
 * omit in the initial actions below installing of Localstack via Helm
 
 ### Initial actions
 
 ```
 cd ./7-cronjob-with-aws-s3
-kubectl apply -f s3-config.yaml
+kubectl apply -f s3-configmap.yaml
 kubectl apply -f s3-secret.yaml
 # install Localstack via Helm
 helm upgrade --install localstack localstack --repo https://helm.localstack.cloud -f localstack-values.yaml --set service.type=LoadBalancer
@@ -248,5 +248,22 @@ aws --endpoint http://localhost:4566 s3 ls s3://backups --recursive
 helm delete localstack
 kubectl delete -f db-backup-cronjob.yaml
 kubectl delete -f s3-secret.yaml
-kubectl delete -f s3-config.yaml
+kubectl delete -f s3-configmap.yaml
+cd ..
+```
+
+# Installing useful tools in Kubernetes
+
+## 8. Installing pgAdmin
+
+This example is based on the blog [How to Deploy pgAdmin in Kubernetes](https://www.enterprisedb.com/blog/how-deploy-pgadmin-kubernetes).
+
+```
+cd ./8-pgadmin
+kubectl create namespace pgadmin --dry-run=client -o yaml | kubectl apply -f -
+kubectl -n pgadmin apply -f pgadmin-secret.yaml
+kubectl -n pgadmin apply -f pgadmin-configmap.yaml
+kubectl -n pgadmin apply -f pgadmin-service.yaml
+kubectl -n pgadmin apply -f pgadmin-statefulset.yaml
+cd ..
 ```

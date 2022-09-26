@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+ name: pgadmin
+spec:
+ serviceName: pgadmin-service
+ podManagementPolicy: Parallel
+ replicas: 1
+ updateStrategy:
+   type: RollingUpdate
+ selector:
+   matchLabels:
+     app: pgadmin
+ template:
+   metadata:
+     labels:
+       app: pgadmin
+   spec:
+     terminationGracePeriodSeconds: 10
+     containers:
+       - name: pgadmin
+         image: dpage/pgadmin4:6.14
+         imagePullPolicy: Always
+         env:
+         - name: PGADMIN_DEFAULT_EMAIL
+           value: pgadmin@pgadmin.com
+         - name: PGADMIN_DEFAULT_PASSWORD
+           valueFrom:
+             secretKeyRef:
+               name: pgadmin-secret
+               key: pgadmin-password
+         ports:
+         - name: http
+           containerPort: 80
+           protocol: TCP
+         volumeMounts:
+         # get file from ConfigMap
+         - name: pgadmin-config
+           mountPath: /pgadmin4/servers.json
+           subPath: servers.json
+           readOnly: true
+         - name: pgadmin-data
+           mountPath: /var/lib/pgadmin
+     volumes:
+     # volumes may be generated from ConfigMaps, Secrets, etc.
+     - name: pgadmin-config
+       configMap:
+         name: pgadmin-config
+ volumeClaimTemplates:
+ - metadata:
+     name: pgadmin-data
+   spec:
+     accessModes: [ "ReadWriteOnce" ]
+     resources:
+       requests:
+         storage: 1Gi
