@@ -55,6 +55,6 @@ spec:
               image: tiredofit/db-backup:3.4.2
               command:
                 - backup-now
-          restartPolicy: Never
+          restartPolicy: OnFailure                
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1

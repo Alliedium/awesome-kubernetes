@@ -190,7 +190,7 @@ kubectl delete -f s3-secret.yaml
 cd ..
 ```
 
-## 7. Cron Job with AWS S3 storage
+## 7. CronJob with AWS S3 storage
 
 We are using `Localstack` in this example instead of using real AWS S3 storage. But if you wish to use the latter one, please make the following:
 
@@ -199,7 +199,7 @@ We are using `Localstack` in this example instead of using real AWS S3 storage. 
 * in AWS IAM create a user with programmatic access having full access to this bucket
 * change values in `s3-secret.yaml` by real values of `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` taken for this user
 * change values in `s3-configmap.yaml` by the values according the comments in that file
-* omit in the initial actions below installing of Localstack via Helm
+* omit in the initial actions below installing of `Localstack` via Helm
 
 ### Initial actions
 
@@ -211,15 +211,15 @@ kubectl apply -f s3-secret.yaml
 helm upgrade --install localstack localstack --repo https://helm.localstack.cloud -f localstack-values.yaml --set service.type=LoadBalancer
 ```
 
-### Deploy Cron job
+### Deploy CronJob
 
 ```
 kubectl apply -f db-backup-cronjob.yaml
 ```
 
-### Test Cron job
+### Test CronJob
 
-Either trigger Cron job manually via some tool like OpenLens or execute the following:
+Either trigger CronJob manually via some tool like `OpenLens` or execute the following:
 ```
 kubectl create job --from=cronjob/db-backup db-backup-manual-$(openssl rand -hex 3)
 ```
@@ -231,7 +231,7 @@ aws s3 ls s3://backups --recursive
 
 ```
 
-Otherwise, when `Localstack` is used (as is by default here), either create port forwarding for `localstack` service via some tool like OpenLens or execute
+Otherwise, when `Localstack` is used (as is by default here), either create port forwarding for `localstack` service via some tool like `OpenLens` or execute
 
 ```
 kubectl port-forward svc/localstack 4566:4566 &
