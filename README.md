@@ -60,7 +60,7 @@ cd ./2-pods-with-ephemeral-volume
 kubectl apply -f db-pod.yaml
 kubectl wait pod database-pod --for condition=Ready --timeout=90s
 DATABASE_POD_IP=$(kubectl get pod database-pod --template '{{.status.podIP}}')
-cat api-pod.yaml | sed "s/<database-pod-ip>/${DATABASE_POD_IP//./-}/" | kubectl apply -f -
+cat api-pod-template.yaml | sed "s/<database-pod-ip>/${DATABASE_POD_IP//./-}/" | kubectl apply -f -
 kubectl wait pod api-pod --for condition=Ready --timeout=90s
 kubectl port-forward api-pod 7880:80
 cd ..
@@ -69,7 +69,7 @@ cd ..
 ### Advantages
 
 - Now volume with database data belongs only to database
-- Components are separated: now crashing of one component does not lead immediately to stopping the other
+- Components are separated: we are able to update the api app without restarting database (and losing its data)
 
 ### Disadvantages
 
