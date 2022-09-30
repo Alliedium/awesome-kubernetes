@@ -28,8 +28,6 @@ spec:
                   value: S3
                 - name: S3_PATH
                   value: ''
-                - name: S3_BUCKET
-                  value: backups
                 - name: S3_KEY_ID
                   valueFrom:
                     secretKeyRef:

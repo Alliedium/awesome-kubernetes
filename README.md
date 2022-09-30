@@ -30,7 +30,7 @@ kubectl create namespace example-api
 ```
 This is necessary ONLY for examples 1--5 below concerning deployment variants.
 
-For examples 6 and 7 it is assumed that the example 5 is already deployed, instructions on removing resources concerning examples 6 and 7 are given below along the examples themselves.
+For examples 6 and 7 it is assumed that the example 5 is already deployed, instructions on removing resources concerning examples 6, 7 and 8 are given below along the examples themselves.
 
 # Deployment variants
 
@@ -192,16 +192,16 @@ cd ..
 
 ## 7. CronJob with AWS S3 storage
 
-We are using `Localstack` in this example instead of using real AWS S3 storage. But if you wish to use the latter one, please make the following:
+There are two scenarios below for initial actions need to be done before applying manifests to Kubernetes:
 
-* create an AWS account
-* in AWS S3 in some region create a bucket named `backups`
-* in AWS IAM create a user with programmatic access having full access to this bucket
-* change values in `s3-secret.yaml` by real values of `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` taken for this user
-* change values in `s3-configmap.yaml` by the values according the comments in that file
-* omit in the initial actions below installing of `Localstack` via Helm
+- **a)** Using `Localstack` as a substitute for real AWS services (doesn't require using some real AWS account)
+- **b)** Using real AWS (as a production-like scenario)
+  
+All further actions such as deploying and testing CronJob as well as cleaning Kubernetes from created resources are the same for both scenarios.
 
-### Initial actions
+### **a)** Initial actions for Localstack AWS S3 Bucket
+
+Please execute
 
 ```
 cd ./7-cronjob-with-aws-s3
@@ -210,6 +210,61 @@ kubectl apply -f s3-secret.yaml
 # install Localstack via Helm
 helm upgrade --install localstack localstack --repo https://helm.localstack.cloud -f localstack-values.yaml --set service.type=LoadBalancer
 ```
+
+Then go to the section `Deploy CronJob` below.
+### **b)** Initial actions for real AWS S3 Bucket
+
+The prerequisites are
+
+- to create an AWS account (or to use some already existing one)
+- to [install](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) `AWS CLI` (on Manjaro it will be already installed after launching the scripts from the [repo](https://github.com/Alliedium/awesome-linux-config))
+- to [configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) `AWS CLI` to interact with AWS via so called *programmatic access*
+
+Then you need to perform the following steps:
+
+* in AWS S3 in some region create a bucket to store backups, its name may be any that is allowed to be chosen (the only restriction in AWS is that this name should not coincide with some already used by someone in AWS)
+* in AWS IAM [create](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) a user with programmatic access
+* [attach](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_manage-attach-detach.html) the following inline policy for this user providing full access to the bucket created above (please change `<bucket-name>` below by the name of your bucket used for storing backups):
+   
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::<bucket-name>"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::<bucket-name>/*"
+            ]
+        }
+    ]
+}
+```
+
+* change values in `s3-secret.yaml` by real values of `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` taken for this user
+* change values in `s3-configmap.yaml` by the values according the comments in that file
+
+After this execute
+```
+cd ./7-cronjob-with-aws-s3
+kubectl apply -f s3-configmap.yaml
+kubectl apply -f s3-secret.yaml
+```
+
+Then go to the section `Deploy CronJob` below.
 
 ### Deploy CronJob
 
@@ -266,4 +321,9 @@ kubectl -n pgadmin apply -f pgadmin-configmap.yaml
 kubectl -n pgadmin apply -f pgadmin-service.yaml
 kubectl -n pgadmin apply -f pgadmin-statefulset.yaml
 cd ..
+```
+
+To remove the resources it is sufficient to execute
+```
+kubectl delete namespace pgadmin
 ```

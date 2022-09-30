@@ -6,3 +6,4 @@ data:
   S3_HOST: localstack:4566 # use s3.amazonaws.com for real AWS S3
   S3_PROTOCOL: http        # use https for real AWS S3
   S3_REGION: us-east-1     # adjust region if necessary
+  S3_BUCKET: backups       # put the real name of S3 bucket
