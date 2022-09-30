@@ -299,8 +299,6 @@ kubectl apply -f s3-configmap.yaml
 kubectl apply -f s3-secret.yaml
 ```
 
-Then go to the section `Deploy CronJob` below.
-
 #### Deploy CronJob
 
 ```
@@ -322,7 +320,7 @@ aws s3 ls s3://backups --recursive
 
 ```
 
-You should see all the files for created backups.
+You should see all the files for created backups (you can also view them via [console](https://s3.console.aws.amazon.com/s3/home)).
 
 #### Cleaning actions
 
