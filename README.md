@@ -197,9 +197,9 @@ There are two scenarios below for initial actions need to be done before applyin
 - **a)** Using `Localstack` as a substitute for real AWS services (doesn't require using some real AWS account)
 - **b)** Using real AWS (as a production-like scenario)
   
-All further actions such as deploying and testing CronJob as well as cleaning Kubernetes from created resources are the same for both scenarios.
+### **a)** Using Localstack AWS S3 Bucket
 
-### **a)** Initial actions for Localstack AWS S3 Bucket
+#### Initial actions
 
 Please execute
 
@@ -211,7 +211,42 @@ kubectl apply -f s3-secret.yaml
 helm upgrade --install localstack localstack --repo https://helm.localstack.cloud -f localstack-values.yaml --set service.type=LoadBalancer
 ```
 
-Then go to the section `Deploy CronJob` below.
+#### Deploy CronJob
+
+```
+kubectl apply -f db-backup-cronjob.yaml
+```
+
+#### Test CronJob
+
+Either trigger CronJob manually via some tool like `OpenLens` or execute the following:
+```
+kubectl create job --from=cronjob/db-backup db-backup-manual-$(openssl rand -hex 3)
+```
+
+After this either create port forwarding for `localstack` service via some tool like `OpenLens` or execute
+
+```
+kubectl port-forward svc/localstack 4566:4566 &
+disown
+```
+and then this please run
+```
+aws --endpoint http://localhost:4566 s3 ls s3://backups --recursive
+```
+
+You should see all the files for created backups.
+
+#### Cleaning actions
+
+```
+helm delete localstack
+kubectl delete -f db-backup-cronjob.yaml
+kubectl delete -f s3-secret.yaml
+kubectl delete -f s3-configmap.yaml
+cd ..
+```
+
 ### **b)** Initial actions for real AWS S3 Bucket
 
 The prerequisites are
@@ -266,41 +301,32 @@ kubectl apply -f s3-secret.yaml
 
 Then go to the section `Deploy CronJob` below.
 
-### Deploy CronJob
+#### Deploy CronJob
 
 ```
 kubectl apply -f db-backup-cronjob.yaml
 ```
 
-### Test CronJob
+
+#### Test CronJob
 
 Either trigger CronJob manually via some tool like `OpenLens` or execute the following:
 ```
 kubectl create job --from=cronjob/db-backup db-backup-manual-$(openssl rand -hex 3)
 ```
 
-After this in the case of real AWS execute
+After this execute
 
 ```
 aws s3 ls s3://backups --recursive
 
 ```
 
-Otherwise, when `Localstack` is used (as is by default here), either create port forwarding for `localstack` service via some tool like `OpenLens` or execute
+You should see all the files for created backups.
+
+#### Cleaning actions
 
 ```
-kubectl port-forward svc/localstack 4566:4566 &
-disown
-```
-and after this please run
-```
-aws --endpoint http://localhost:4566 s3 ls s3://backups --recursive
-```
-
-### Cleaning actions
-
-```
-helm delete localstack
 kubectl delete -f db-backup-cronjob.yaml
 kubectl delete -f s3-secret.yaml
 kubectl delete -f s3-configmap.yaml
