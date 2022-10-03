@@ -232,6 +232,9 @@ disown
 ```
 and then this please run
 ```
+export AWS_ACCESS_KEY_ID=local
+export AWS_SECRET_ACCESS_KEY=local
+
 aws --endpoint http://localhost:4566 s3 ls s3://backups --recursive
 ```
 
