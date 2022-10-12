@@ -367,3 +367,279 @@ There are a few different ways to deal with the problem. Here are just two of th
 Both of these approaches allow us to avoid storing original secret values *directly* inside manifests. However there are cases when it is acceptable to store `Secret` manifests (along with the original secret values) directly inside Git repository. This is when manifests are used only for development purposes (some experiments for instance) and are designed for being deployed in a development cluster and not in production. However the main problem with such an approach is that it can lead to having two sources of truth (read two sets of manifests) - one for development and one for production. In our opinion such approach should be avoided as much as possible (instead we should use production ways to deal with secretes even for development). With all that being said, when such *insecure* is used all the secret values may be shared by developers and the secret values are not *really* hidden. To make the rest of the manifests as environment agnostic as possible we should use [Kubernetes Secrets](https://kubernetes.io/docs/concepts/configuration/secret/) for deploying them to comply with production configurations. Pods just reference these secrets not knowing what their sources are thus making the rest of the manifests the same both for both development and production.
 
 For more details see [Good practices for Kubernetes Secrets](https://kubernetes.io/docs/concepts/security/secrets-good-practices/) and the blog [How to use AWS Secrets & Configuration Provider with your Kubernetes Secrets Store CSI driver](https://aws.amazon.com/ru/blogs/security/how-to-use-aws-secrets-configuration-provider-with-kubernetes-secrets-store-csi-driver/).
+
+
+
+## 9. Installing PostgreSQL with metrics view via Grafana
+
+
+### Prerequisites
+
+Delete the namespace ```example-api```
+
+```
+kubectl delete namespace example-api
+```
+
+### Steps
+
+#### 9.1. Install PostgreSQL via Helm Chart with postgres_exporter tool
+
+**From CLI**
+
+```
+helm repo add bitnami https://charts.bitnami.com/bitnami
+```
+```
+helm repo update
+```
+```
+helm upgrade --install postgresql bitnami/postgresql \
+  --namespace example-api --create-namespace \
+  --set auth.database=example-api \
+  --set metrics.enabled=true \
+  --cleanup-on-fail --wait
+```
+
+Namespace ```example-api``` should be created, in which there should be created also resources
+
+- Pod ```postgresql-0```
+- StatefulSet ```postgresql```
+- one ConfigMap
+- two Secrets
+- three Services
+- PersistentVolumeClaim ```data-postgresql-0```
+- Helm Release ```postgresql```
+
+#### 9.2. Install the Spring Boot API
+
+**From CLI**
+
+Activate the namespace ```example-api```
+
+```
+kubectl ns example-api
+```
+
+Change to the example directory and apply the manifests
+
+```
+cd ./9-metrics-view-via-grafana
+kubectl apply -f db-configmap.yaml
+kubectl apply -f api-deployment.yaml
+kubectl apply -f api-service.yaml
+
+```
+
+
+#### 9.3. Check the api installation
+
+**From OpenLens**
+
+Check that the Pod ```api-<suffix>``` in the namespace ```example-api``` is running
+
+
+**From browser on Local machine**
+
+Open the URL ```http://127.0.0.1:7080```
+
+The 'Simple Spring Boot API' page should be opened
+
+
+#### 9.4. Check the postgres_exporter installation
+
+**From OpenLens**
+
+Nemwork/Services --> Namespace: ```example-api```, Service: ```postgresql-metrics```
+
+Forward port, open in browser
+
+The page 'Postgers exporter' with 'Metrics' link should be displayed
+
+Open the 'Metrics' link, metrics information in the text form should be displayed
+
+Find ```pg_up``` in the text, there should be a line ```pg_up 1``` meaning that the last scrape of metrics from PostgreSQL was able to connect to the server
+
+
+#### 9.5. Prometheus should be installed via Lens metrics. 
+
+**From OpenLens**
+
+Click in the left pane ```k3d-demo``` cluster, then in drop-down list choose 'Settings'
+
+Settings page will be opened
+
+In the left pane of the page, choose 'Lens Metrics'
+
+The tab 'Lens Metrics' will be opened
+
+Make sure that all the three switches are ON. 
+
+**Remark.** If you are making the steps **not** for the first time, renew the Prometheus instalation:
+- switch OFF all the switches
+- click 'Uninstall' button
+- wait untill the objects are uninstalled
+- switch ON all the switches
+- click 'Apply' button
+
+Prometheus can be seen in Workloads/StatefulSets.
+
+
+#### 9.6. Configure Prometheus to scrape the metircs from postgres_exporter
+
+**From CLI**
+
+Install ```yq``` package
+
+```
+yay -S go-yq --noconfirm
+```
+
+Add postgres_exporter scrape settings to Prometheus configuration map
+
+- Put to a variable Prometheus configuration map mainfest supplemented by postgres_exporter scrape settings
+
+```
+PROMETHEUS_YAML=$(kubectl -n lens-metrics get configmap/prometheus-config -o "jsonpath={.data['prometheus\.yaml']}" | yq eval '.scrape_configs += [{"job_name": "postgres-exporter", "kubernetes_sd_configs": [{"role": "service", "namespaces": {"names": ["example-api"]}}], "relabel_configs": [{"source_labels": ["__meta_kubernetes_service_annotation_prometheus_io_scrape"], "action": "keep", "regex": true}]}]' - | sed  "s|\"|'|g")
+```
+
+- Apply the manifest from the variable
+
+```
+kubectl -n lens-metrics get configmap/prometheus-config -o yaml | yq eval '.data."prometheus.yaml" = "'"${PROMETHEUS_YAML}"'"' - | kubectl apply -f -
+```
+
+#### 9.7. Check that postgres_exporter scrape settings were added to Prometheus
+
+**From OpenLens**
+
+Config/ConfigMaps, click on ```prometheus-config```, see YAML.
+
+There should be a section at the bottom
+
+```
+      - job_name: postgres-exporter
+        kubernetes_sd_configs:
+          - role: service
+            namespaces:
+              names:
+                - example-api
+        relabel_configs:
+          - source_labels: 
+	      -__meta_kubernetes_service_annotation_prometheus_io_scrape
+            action: keep
+            regex: true
+ ```
+
+
+#### 9.8. Scale down and up Prometheus StatefulSet
+
+**From CLI**
+
+```
+kubectl -n lens-metrics scale --replicas=0 statefulset/prometheus
+```
+
+```
+kubectl -n lens-metrics scale --replicas=1 statefulset/prometheus
+```
+
+
+#### 9.9. Check that Prometheus is scraping the metircs from postgres_exporter
+
+**From OpenLens**
+
+Nemwork/Services --> Namespace: ```lens-metrics```, Service: ```prometheus```
+
+Forward port, open in browser
+
+The Prometheus page will be opened
+
+In the top menu click 'Status' and choose 'Targets' in drop-down list
+
+The 'Targets' page will be opened
+
+Click 'Collapse All' button in menu below the 'Targets' title
+
+See that ```postgres-exporter``` target is in the page
+
+
+#### 9.10. Install Grafana
+
+**From OpenLens**
+
+Create new namespace ```grafana```
+
+Install grafana to the namespace ```grafana``` via Helm chart
+
+
+#### 9.11. Get Grafana admin's password from the secret
+
+Config/Secrets --> Namespace: ```grafana```,
+click on the secret ```grafana-<digital_suffix>-admin``` 
+	
+The right pane with secret properties will be opened
+    
+On the right pane, find the field ```GF_SECURITY_ADMIN_PASSWORD```
+
+Click at 'Show' button to the right of the field
+	
+Copy field value to the clipboard
+
+
+#### 9.12. Open Grafana in browser
+
+Nemwork/Services --> Namespace: ```grafana```, Service: ```grafana-<digital_suffix>```
+
+Forward port, open in browser
+
+Enter login 'admin', paste the password taken from the secret ```grafana-<digital_suffix>-admin``` on the previous step
+
+
+#### 9.13. Add Prometheus datasource to Grafana
+
+**On the Grafana page in browser**
+
+Hover the mouse pointer on gear wheel sign at the bottom part of the left toolbar
+
+Click 'Data sources' record
+
+Configuration page, tab 'Data sources' will be opened
+
+Click 'Add data source' button
+
+Time series databases list will be opened
+
+Choose 'Prometheus'
+
+The form 'Data sources / Prometheus', tab 'Settings' will be opened
+
+Enter the URL: ```http://prometheus.lens-metrics.svc.cluster.local```
+
+Click 'Save & test' button at the bottom of the form
+
+Wait until the field above the button displays record 'Data source is working'
+
+
+#### 9.14. Import PostgreSQL Dashboard to Grafana 
+
+Hover the mouse pointer on four squares sign at the top part of the left toolbar
+
+Click 'Dashboards' record
+
+Dashboards page, tab 'Browse' will be opened
+
+At the button 'New' open the drop-down list and choose 'Import'
+
+Enter the URL ```https://grafana.com/grafana/dashboards/9628-postgresql-database/``` into 'Import via grafana.com' field 
+
+Click 'Load' button
+
+In the field 'DS_PROMETHEUS' at the bottom, choose the 'Prometheus' data source
+
+Click 'Import' button
+
+**You are done**, the 'PostgreSQL Database' dashboard with the metrics will be displayed
+
+
+
