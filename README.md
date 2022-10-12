@@ -432,7 +432,7 @@ kubectl apply -f api-service.yaml
 ```
 
 
-#### 9.3. Check the api installation
+#### 9.3. Check the Spring Boot API installation
 
 **From OpenLens**
 
