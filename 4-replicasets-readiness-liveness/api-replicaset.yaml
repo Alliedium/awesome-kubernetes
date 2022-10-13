@@ -5,7 +5,7 @@ metadata:
   labels:
     component: api
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       component: api
