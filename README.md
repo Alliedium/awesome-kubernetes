@@ -385,6 +385,13 @@ kubectl delete namespace example-api
 
 #### 9.1. Install PostgreSQL via Helm Chart with postgres_exporter tool
 
+[PostgreSQL](https://www.postgresql.org/)
+is the world's most advanced Open Source Relational Database
+
+[Helm](https://helm.sh/) is a convenient tool, like a package manager, 
+for deploying applications with complex structure in Kubernetes, 
+see also [github](https://github.com/helm/helm#helm)
+
 **From CLI**
 
 ```
@@ -393,6 +400,11 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 ```
 helm repo update
 ```
+
+[Bitnami](https://bitnami.com/)
+is a leading provider of prepackaged open source software that runs natively in various environments: in the major public clouds, on laptops, 
+and on [Kubernetes](https://bitnami.com/stacks/helm)
+
 ```
 helm upgrade --install postgresql bitnami/postgresql \
   --namespace example-api --create-namespace \
@@ -450,11 +462,11 @@ The 'Simple Spring Boot API' page should be opened
 
 **From OpenLens**
 
-Nemwork/Services --> Namespace: ```example-api```, Service: ```postgresql-metrics```
+Network/Services --> Namespace: ```example-api```, Service: ```postgresql-metrics```
 
 Forward port, open in browser
 
-The page 'Postgers exporter' with 'Metrics' link should be displayed
+The page 'Postgres exporter' with 'Metrics' link should be displayed
 
 Open the 'Metrics' link, metrics information in the text form should be displayed
 
@@ -549,7 +561,7 @@ kubectl -n lens-metrics scale --replicas=1 statefulset/prometheus
 
 **From OpenLens**
 
-Nemwork/Services --> Namespace: ```lens-metrics```, Service: ```prometheus```
+Network/Services --> Namespace: ```lens-metrics```, Service: ```prometheus```
 
 Forward port, open in browser
 
@@ -570,7 +582,7 @@ See that ```postgres-exporter``` target is in the page
 
 Create new namespace ```grafana```
 
-Install grafana to the namespace ```grafana``` via Helm chart
+Install Grafana to the namespace ```grafana``` via Helm chart
 
 
 #### 9.11. Get Grafana admin's password from the secret
@@ -589,7 +601,7 @@ Copy field value to the clipboard
 
 #### 9.12. Open Grafana in browser
 
-Nemwork/Services --> Namespace: ```grafana```, Service: ```grafana-<digital_suffix>```
+Network/Services --> Namespace: ```grafana```, Service: ```grafana-<digital_suffix>```
 
 Forward port, open in browser
 
