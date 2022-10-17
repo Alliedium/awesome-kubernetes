@@ -470,7 +470,7 @@ Open the URL ```http://127.0.0.1:7080```
 The 'Simple Spring Boot API' page should be opened
 
 
-#### 9.4. Check the [postgres_exporter](https://github.com/prometheus-community/postgres_exporter) installation
+#### 9.4. Check the postgres_exporter installation
 
 **From OpenLens**
 
@@ -485,7 +485,7 @@ Open the 'Metrics' link, metrics information in the text form should be displaye
 Find ```pg_up``` in the text, there should be a line ```pg_up 1``` meaning that the last scrape of metrics from PostgreSQL was able to connect to the server
 
 
-#### 9.5. [Prometheus](https://prometheus.io/docs/introduction/overview/) should be installed via Lens metrics. 
+#### 9.5. Prometheus should be installed via Lens metrics. 
 
 **From OpenLens**
 
@@ -588,7 +588,9 @@ Click 'Collapse All' button in menu below the 'Targets' title
 See that ```postgres-exporter``` target is in the page
 
 
-#### 9.10. Install [Grafana](https://github.com/grafana/grafana)
+#### 9.10. Install Grafana
+
+[Grafana](https://github.com/grafana/grafana) is an open-source platform for monitoring and observability. Grafana allows you to query, visualize, alert on and understand your metrics no matter where they are stored  
 
 **From OpenLens**
 
