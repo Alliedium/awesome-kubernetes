@@ -414,8 +414,8 @@ helm repo update
 ```
 
 [Bitnami](https://bitnami.com/)
-is a leading provider of prepackaged open source software that runs natively in various environments: in the major public clouds, on laptops, 
-and [on Kubernetes](https://bitnami.com/stacks/helm)
+is a leading provider of prepackaged open source software that runs natively in various platforms, including the major public clouds, laptops, 
+and [Kubernetes](https://bitnami.com/stacks/helm)
 
 ```
 helm upgrade --install postgresql bitnami/postgresql \
