@@ -1,12 +1,12 @@
-# Prerequisites
+# 1. Prerequisites
 
-1. Create a cluster with a registry
+- Create a cluster with a registry
 
 ```
 k3d cluster create demo --k3s-arg "--no-deploy=traefik@server:*" --registry-create demo-registry:0.0.0.0:12345 --port 7080:8080@loadbalancer
 ```
 
-2. Build and push a Docker image (it is assumed that current folder is `.k8s`)
+- Build and push a Docker image (it is assumed that current folder is `.k8s`)
 
 
 ```
@@ -14,9 +14,7 @@ docker build --file ../api/docker/Dockerfile.prod -t localhost:12345/example-api
 docker push localhost:12345/example-api:0.1.0
 ```
 
-For examples 6 and 7 it is assumed that the example 5 is already deployed, instructions on removing resources concerning examples 6, 7 and 8 are given below along the examples themselves.
-
-# Deployment variants
+# 2. Deployment variants
 
 | Example | Details |
 |------|-------|
@@ -26,22 +24,7 @@ For examples 6 and 7 it is assumed that the example 5 is already deployed, instr
 | [Example 4](./4-replicasets-readiness-liveness) | ReplicaSets, Readiness and Liveness probes |
 | [Example 5](./5-deployment-statefulset-configmap-secret) | Deployment, StatefulSet, ConfigMap, Secret |
 
-# Backup jobs configuration variants
-
-Both examples below assume that the [Example 5](./5-deployment-statefulset-configmap-secret) is already deployed and not cleaned up from the cluster.
-
-| Example | Details |
-|------|-------|
-| [Example 6](./6-job-with-minio) | Simple job with Minio S3 storage |
-| [Example 7](./7-cronjob-with-aws-s3) | CronJob with AWS S3 storage |
-
-# Installing useful tools in Kubernetes
-
-| Example | Details |
-|------|-------|
-| [Example 8](./8-pgadmin) | Installing pgAdmin |
-
-# Remarks concerning secrets
+## Remarks concerning secrets
 
 For many examples above we have used manifests for [Kubernetes Secrets](https://kubernetes.io/docs/concepts/configuration/secret/). And secret values in these manifests were hard coded. But this is just for simplicity, i.e. it is not how secrets are to be handled in real production. The reason is that these hard coded values can be seen by any person having access to respective Git repository which contradicts with an idea of secrets being a secret. 
 
@@ -54,7 +37,22 @@ Both of these approaches allow us to avoid storing original secret values *direc
 
 For more details see [Good practices for Kubernetes Secrets](https://kubernetes.io/docs/concepts/security/secrets-good-practices/) and the blog [How to use AWS Secrets & Configuration Provider with your Kubernetes Secrets Store CSI driver](https://aws.amazon.com/ru/blogs/security/how-to-use-aws-secrets-configuration-provider-with-kubernetes-secrets-store-csi-driver/).
 
-# Using aready existing Helm charts and operators
+# 3. Backup jobs configuration variants
+
+Both examples below assume that the [Example 5](./5-deployment-statefulset-configmap-secret) is already deployed and not cleaned up from the cluster.
+
+| Example | Details |
+|------|-------|
+| [Example 6](./6-job-with-minio) | Simple job with Minio S3 storage |
+| [Example 7](./7-cronjob-with-aws-s3) | CronJob with AWS S3 storage |
+
+# 4. Installing useful tools in Kubernetes
+
+| Example | Details |
+|------|-------|
+| [Example 8](./8-pgadmin) | Installing pgAdmin |
+
+# 5. Using aready existing Helm charts and operators
 
 | Example | Details |
 |------|-------|

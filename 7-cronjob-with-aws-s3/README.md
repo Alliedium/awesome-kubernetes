@@ -1,6 +1,6 @@
 # CronJob with AWS S3 storage
 
-Please perform the steps mentioned in [Prerequisites](../README.md#prerequisites).
+Please follow the steps from [Prerequisites](../README.md#prerequisites) prior to executing the commands below.
 Besides, this example assumes that the [Example 5](../5-deployment-statefulset-configmap-secret) is already deployed and not cleaned up from the cluster.
 
 There are two scenarios below for initial actions need to be done before applying manifests to Kubernetes:

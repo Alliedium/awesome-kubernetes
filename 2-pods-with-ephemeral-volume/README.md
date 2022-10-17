@@ -1,6 +1,6 @@
 # Only pods, no persistence due to ephemeral volume
 
-Please perform the steps mentioned in [Prerequisites](../README.md#prerequisites).
+Please follow the steps from [Prerequisites](../README.md#prerequisites) prior to executing the commands below.
 
 ## Initial actions
 
