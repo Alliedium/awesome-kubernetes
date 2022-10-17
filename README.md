@@ -381,16 +381,28 @@ Delete the namespace ```example-api```
 kubectl delete namespace example-api
 ```
 
+Install [Helm](https://helm.sh/) if it is not installed yet. On Manjaro Linux, run the command
+
+```
+yay -S helm --noconfirm
+```
+
+Otherwise, see [intallation instructions](https://helm.sh/docs/intro/install/)
+
+
 ### Steps
 
 #### 9.1. Install PostgreSQL via Helm Chart with postgres_exporter tool
 
-[PostgreSQL](https://www.postgresql.org/)
-is the world's most advanced Open Source Relational Database
-
 [Helm](https://helm.sh/) is a convenient tool, like a package manager, 
 for deploying applications with complex structure in Kubernetes, 
 see also [github](https://github.com/helm/helm#helm)
+
+[PostgreSQL](https://www.postgresql.org/)
+is the world's most advanced Open Source Relational Database
+
+PostgreSQL Server Exporter ([postgres_exporter](https://github.com/prometheus-community/postgres_exporter)) is an exporter of PostgreSQL server metrics for 
+[Prometheus](https://prometheus.io/docs/introduction/overview/).
 
 **From CLI**
 
@@ -403,7 +415,7 @@ helm repo update
 
 [Bitnami](https://bitnami.com/)
 is a leading provider of prepackaged open source software that runs natively in various environments: in the major public clouds, on laptops, 
-and on [Kubernetes](https://bitnami.com/stacks/helm)
+and [on Kubernetes](https://bitnami.com/stacks/helm)
 
 ```
 helm upgrade --install postgresql bitnami/postgresql \
@@ -458,7 +470,7 @@ Open the URL ```http://127.0.0.1:7080```
 The 'Simple Spring Boot API' page should be opened
 
 
-#### 9.4. Check the postgres_exporter installation
+#### 9.4. Check the [postgres_exporter](https://github.com/prometheus-community/postgres_exporter) installation
 
 **From OpenLens**
 
@@ -473,7 +485,7 @@ Open the 'Metrics' link, metrics information in the text form should be displaye
 Find ```pg_up``` in the text, there should be a line ```pg_up 1``` meaning that the last scrape of metrics from PostgreSQL was able to connect to the server
 
 
-#### 9.5. Prometheus should be installed via Lens metrics. 
+#### 9.5. [Prometheus](https://prometheus.io/docs/introduction/overview/) should be installed via Lens metrics. 
 
 **From OpenLens**
 
@@ -501,7 +513,7 @@ Prometheus can be seen in Workloads/StatefulSets.
 
 **From CLI**
 
-Install ```yq``` package
+Install [yq](https://github.com/mikefarah/yq) package
 
 ```
 yay -S go-yq --noconfirm
@@ -576,7 +588,7 @@ Click 'Collapse All' button in menu below the 'Targets' title
 See that ```postgres-exporter``` target is in the page
 
 
-#### 9.10. Install Grafana
+#### 9.10. Install [Grafana](https://github.com/grafana/grafana)
 
 **From OpenLens**
 
