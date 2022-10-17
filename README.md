@@ -54,7 +54,7 @@ Both of these approaches allow us to avoid storing original secret values *direc
 
 For more details see [Good practices for Kubernetes Secrets](https://kubernetes.io/docs/concepts/security/secrets-good-practices/) and the blog [How to use AWS Secrets & Configuration Provider with your Kubernetes Secrets Store CSI driver](https://aws.amazon.com/ru/blogs/security/how-to-use-aws-secrets-configuration-provider-with-kubernetes-secrets-store-csi-driver/).
 
-# Using ready Helm charts and operators
+# Using aready existing Helm charts and operators
 
 | Example | Details |
 |------|-------|
