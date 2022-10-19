@@ -20,7 +20,10 @@ kubectl get nodes
 
 
 ### 1. Create namespace ```example-api``` 	
-	
+
+```
+kubectl create namespace example-api
+```
 	
 ### 2. Install ```postgres-operator``` and ```postgres-operator-ui``` via Helm Charts
 
