@@ -103,7 +103,7 @@ where you can edit settings and apply changes without stopping the PostgreSQL cl
 
 ### 6. Install Spring Boot API
 
-Make ```example-api``` default namespace and apply the manifests
+Make ```example-api``` active namespace and apply the manifests
 
 ```
 kubectl ns example-api
