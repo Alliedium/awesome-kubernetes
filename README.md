@@ -57,3 +57,4 @@ Both examples below assume that the [Example 5](./5-deployment-statefulset-confi
 | Example | Details |
 |------|-------|
 | [Example 9](./9-metrics-view-via-grafana) | Installing PostgreSQL with metrics view via Grafana |
+| [Example 10](./10-postgres-operator) | Installing scalable PostgreSQL via Kubernetes operator |
