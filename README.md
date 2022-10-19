@@ -26,7 +26,7 @@ docker push localhost:12345/example-api:0.1.0
 
 ## Remarks concerning secrets
 
-For the last example above as well as for some examples below we use manifests for [Kubernetes Secrets](https://kubernetes.io/docs/concepts/configuration/secret/). And secret values in these manifests were hard coded. But this is just for simplicity, i.e. it is not how secrets are to be handled in real production. The reason is that these hard coded values can be seen by any person having access to respective Git repository which contradicts with an idea of secrets being a secret. 
+For the last example above as well as for some examples below we use manifests for [Kubernetes Secrets](https://kubernetes.io/docs/concepts/configuration/secret/). And secret values in these manifests are hard coded. But this is just for simplicity, i.e. it is not how secrets are to be handled in real production. The reason is that these hard coded values can be seen by any person having access to respective Git repository which contradicts with an idea of secrets being a secret. 
 
 There are a few different ways to deal with the problem. Here are just two of them (without claiming that these two are the only onces that should be used):
 
