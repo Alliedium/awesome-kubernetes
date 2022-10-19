@@ -3,98 +3,24 @@
 ## Prerequisites
 
 
-- Delete previously created cluster
+- Add two nodes (agents) to the cluster
 
 ```
-k3d cluster delete demo
+k3d node create demo-agent-1 -c demo
+k3d node create demo-agent-2 -c demo
 ```
 
-- Create new k3d ```demo``` cluster with 3 nodes and local container registry
+- Get the cluster nodes
 
 ```
-k3d cluster create demo -s 3 --k3s-arg "--no-deploy=traefik@server:*" --registry-create demo-registry:0.0.0.0:12345 --port 7080:8080@loadbalancer
+k3d node list
+kubectl get nodes
 ```
-
-- Change to ```.k8s``` folder
-
-- Build (if necessary) and push example-api Docker image to the local container registry 
-
-```
-docker build --file ../api/docker/Dockerfile.prod -t localhost:12345/example-api:0.1.0 ../api
-docker push localhost:12345/example-api:0.1.0
-```
-
-- Extract a minimal kubeconfig for the context k3d-demo
-
-```
-kubectl konfig export k3d-demo > ~/.kube/k3d-demo.config
-```
-
-- See the contents of the file ~/.kube/k3d-demo.config
-
-```
-nano ~/.kube/k3d-demo.config
-```
-
-Fix the cluster port on VM, e.g. 36483 for the following example
-
-```
-apiVersion: v1
-clusters:
-- cluster:
-    certificate-authority-data: LS0tLS...
-    server: https://0.0.0.0:36483
-  name: k3d-demo
-...
-```
-
-- Logout from the VM
-
-```
-exit
-```
-
-- Use your ssh connection data and your HOME path on the VM to copy the extracted context via ssh to the local machine.
-
-```<ssh_connection_data>``` can have the form ```<login_on_VM>@<IP_address_of_VM>``` e.g. ```bkarpov@192.168.1.208```, 
-or be an alias configured for connection to VM in ```~/.ssh/config```
-
-```<HOME_path>``` is the absolute path to your HOME directory on the VM, e.g. ```/home/bkarpov```
-
-```
-scp <ssh_connection_data>:<HOME_path>/.kube/k3d-demo.config .
-```
-
-e.g. ```scp bkarpov@192.168.1.208:/home/bkarpov/.kube/k3d-demo.config .```
-
-The file should be copied to the working directory on the local machine
-
-- Use your cluster port on VM fixed above to forward from local machine to the VM via ssh tunnel.
-Forward also ports: 7080 for Spring Boot API and 9080-->8080 for Visual Studio Code 
-
-```
-ssh -L <cluster_port>:127.0.0.1:<cluster_port> \
-    -L 7080:127.0.0.1:7080 \
-	-L -L 9080:127.0.0.1:8080 \
-<ssh_connection_data>
-```
-
-e.g. ```ssh -L 36483:127.0.0.1:36483 bkarpov@192.168.1.208```
-
-```
-ssh -L 36483:127.0.0.1:36483 \
-    -L 7080:127.0.0.1:7080 \
-    -L 9080:127.0.0.1:8080 \
-bkarpov@192.168.1.208
-```
-
-- Use the file ```k3d-demo.config``` in the working directory on local machine to connect to the cluster from OpenLens
-
 
 ## Steps
 
 
-### 1. Create namespace ```zalando-postgres-ha``` 	
+### 1. Create namespace ```example-api``` 	
 	
 	
 ### 2. Install ```postgres-operator``` and ```postgres-operator-ui``` via Helm Charts
@@ -123,7 +49,7 @@ Add repo for postgres-operator-ui
 Close the menu tab
 
 
-Helm / Charts, Search 'postgres', install to the namespace ```zalando-postgres-ha```
+Helm / Charts, Search 'postgres', install to the namespace ```example-api```
 
 - postgres-operator
 
@@ -139,7 +65,7 @@ Custom Resources / acid.zalan.do / postgresql
 
 ### 4. Create new PostgreSQL cluster
 
-Network / Services --> namespace: 'zalando-postgres-ha', service: 'postgres-operator-ui'
+Network / Services --> namespace: 'example-api', service: 'postgres-operator-ui'
 
 Forward port, open in browser the web console
 
@@ -148,7 +74,7 @@ Forward port, open in browser the web console
 Go to Tab 'New cluster', fillout the fields
 
 	Name: enter your <cluster_name> (e.g. ```pg-demo```)
-	Namespace: choose 'zalando-postgres-ha' (available because of ```targetNamespace: '*'``` for the ui)
+	Namespace: choose 'example-api' (available because of ```targetNamespace: '*'``` for the ui)
 	Owning team: default 'acid', the team's name, editable. It will be a prefix for Kubernetes resources names
 	Number of instances: 3
 	Master load balancer: uncheck 
@@ -178,7 +104,7 @@ where you can edit settings and apply changes without stopping the PostgreSQL cl
 
 ### 6. Install Spring Boot API
 
-Activate the namespace ```zalando-postgres-ha```
+Activate the namespace ```example-api```
 
 Change to ```.k8s/10-postgres-operator``` folder 
 
@@ -192,7 +118,7 @@ kubectl apply -f api-service.yaml
 
 ### 7. Check the Spring Boot API installation
 
-Wait unitl the pod ```api-<suffix>``` in the namespace ```zalando-postgres-ha``` is running
+Wait unitl the pod ```api-<suffix>``` in the namespace ```example-api``` is running
 
 **From browser on Local machine**
 
@@ -248,12 +174,12 @@ Log in via ```env.email``` and ```env.password``` values fixed in the previous s
 
 **From OpenLens**
 
-Config /Secrets --> namespace: 'zalando-postgres-ha', click on 'postgres.<postgres_cluster_name>' (with the name os the Postgres cluster)
+Config /Secrets --> namespace: 'example-api', click on 'postgres.<postgres_cluster_name>' (with the name os the Postgres cluster)
 
 (postgres_cluster_name: ```acid-pg-demo``` in our example, it can be seen via Services)
 
 Fix username, password, full DNS name of the service
-(```acid-pg-demo.zalando-postgres-ha.svc.cluster.local``` in our example) 
+(```acid-pg-demo.example-api.svc.cluster.local``` in our example) 
 
 
 **From pgadmin web console**
@@ -265,7 +191,7 @@ Use the fixed username, password, full DNS name
 ## Cleanup actions
 
 ```
-kubectl delete namespace zalando-postgres-ha
+kubectl delete namespace example-api
 kubectl delete namespace pgadmin4
 ```
 
