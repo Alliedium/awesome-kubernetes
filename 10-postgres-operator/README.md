@@ -97,7 +97,7 @@ The Kubernetes resources will be created
 where you can edit settings and apply changes without stopping the PostgreSQL cluster 
 
 
-### 5. Watch how the cluster is creating in OpenLens 
+### 5. Watch how Postgres cluster is creating in OpenLens 
 - Workloads / StatefulSets
 - Custom Resources / acid.zalan.do / postgresql
 
@@ -116,7 +116,7 @@ kubectl apply -f api-deployment.yaml
 kubectl apply -f api-service.yaml
 ```
 
-### 7. Check the Spring Boot API installation
+### 7. Check Spring Boot API installation
 
 Wait unitl the pod ```api-<suffix>``` in the namespace ```example-api``` is running
 
@@ -170,7 +170,7 @@ Forward port, open in browser
 Log in via ```env.email``` and ```env.password``` values fixed in the previous step
 
 
-### 11. Connect to the server
+### 11. Connect to server
 
 **From OpenLens**
 
@@ -188,7 +188,7 @@ Create a new server connection
 
 Use the fixed username, password, full DNS name
 
-## Cleanup actions
+## Cleanup
 
 ```
 kubectl delete namespace example-api
