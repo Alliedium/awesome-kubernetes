@@ -103,13 +103,10 @@ where you can edit settings and apply changes without stopping the PostgreSQL cl
 
 ### 6. Install Spring Boot API
 
-Activate the namespace ```example-api```
-
-Change to ```.k8s/10-postgres-operator``` folder 
-
 Apply the manifests
 
 ```
+kubectl ns example-api
 kubectl apply -f db-configmap.yaml
 kubectl apply -f api-deployment.yaml
 kubectl apply -f api-service.yaml
@@ -117,7 +114,7 @@ kubectl apply -f api-service.yaml
 
 ### 7. Check Spring Boot API installation
 
-Wait unitl the pod ```api-<suffix>``` in the namespace ```example-api``` is running
+Wait until the pod ```api-<suffix>``` in the namespace ```example-api``` is running
 
 **From browser on Local machine**
 
