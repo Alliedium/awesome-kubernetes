@@ -6,8 +6,7 @@
 - Add two nodes (agents) to the cluster
 
 ```
-k3d node create demo-agent-1 -c demo
-k3d node create demo-agent-2 -c demo
+k3d node create demo-agent -c demo --replicas 2
 ```
 
 - Get the cluster nodes
