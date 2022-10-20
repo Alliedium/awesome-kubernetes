@@ -295,7 +295,7 @@ Click 'Import' button
 
 **You are done**, the 'PostgreSQL Database' dashboard with the metrics will be displayed
 
-## Cleaning actions
+## Cleanup
 
 ```
 kubectl delete namespace example-api
