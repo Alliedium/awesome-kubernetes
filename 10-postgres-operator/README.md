@@ -75,9 +75,9 @@ Forward port, open in browser the web console
 
 Go to Tab 'New cluster', fillout the fields
 
-	Name: enter your <cluster_name> (e.g. ```pg-demo```)
-	Namespace: choose 'example-api' (available because of ```targetNamespace: '*'``` for the ui)
-	Owning team: default 'acid', the team's name, editable. It will be a prefix for Kubernetes resources names
+	Name: pg-demo
+	Namespace: choose 'example-api' (available because of targetNamespace: '*' for the ui)
+	Owning team: leave the default 'acid', it will be a prefix for Kubernetes resources names
 	Number of instances: 3
 	Master load balancer: uncheck 
 	Replica load balancer: uncheck
