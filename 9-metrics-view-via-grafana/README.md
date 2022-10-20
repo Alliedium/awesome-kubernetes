@@ -294,3 +294,11 @@ In the field 'DS_PROMETHEUS' at the bottom, choose the 'Prometheus' data source
 Click 'Import' button
 
 **You are done**, the 'PostgreSQL Database' dashboard with the metrics will be displayed
+
+## Cleaning actions
+
+```
+kubectl delete namespace example-api
+kubectl delete namespace grafana
+kubectl delete namespace lens-metrics
+```
