@@ -2,20 +2,11 @@
 
 ## Prerequisites
 
-- See that there is no container named 'k3d-demo-tools'
-
-```
-docker ps -a
-```
-
 - Add two nodes (agents) to the cluster
 
 ```
 k3d node create demo-agent -c demo --replicas 2
 ```
-
-It's not an error: ```docker failed to remove the container 'k3d-demo-tools'```
-
 
 - Get the cluster nodes
 
