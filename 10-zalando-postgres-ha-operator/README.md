@@ -2,12 +2,20 @@
 
 ## Prerequisites
 
+- See that there is no container named 'k3d-demo-tools'
+
+```
+docker ps -a
+```
 
 - Add two nodes (agents) to the cluster
 
 ```
 k3d node create demo-agent -c demo --replicas 2
 ```
+
+It's not an error: ```docker failed to remove the container 'k3d-demo-tools'```
+
 
 - Get the cluster nodes
 
@@ -19,53 +27,58 @@ kubectl get nodes
 ## Steps
 
 
-### 1. Create namespace ```example-api``` 	
+### 1. Install ```postgres-operator``` via Helm Chart
 
 ```
-kubectl create namespace example-api
+helm repo add postgres-operator-charts https://opensource.zalando.com/postgres-operator/charts/postgres-operator
+helm repo update
+helm upgrade --install --cleanup-on-fail postgres-operator postgres-operator-charts/postgres-operator --namespace example-api --create-namespace
 ```
-	
-### 2. Install ```postgres-operator``` and ```postgres-operator-ui``` via Helm Charts
 
-**From OpenLens** interface perform the following steps which are equivalent to
-[CLI installation instructions](https://github.com/zalando/postgres-operator/blob/master/docs/quickstart.md#helm-chart)
-
-Open menu 'File-->Preferences', tab 'Kubernetes', section 'Helm Charts' at the bottom, button ```Add Custom Helm Repo```
-
-Add repo for postgres-operator
-
-- Helm repo name: postgres-operator-charts
-
-- URL: https://opensource.zalando.com/postgres-operator/charts/postgres-operator
-
-- click ```Add```
-
-Add repo for postgres-operator-ui
-
-- Helm repo name: postgres-operator-ui-charts
-
-- URL: https://opensource.zalando.com/postgres-operator/charts/postgres-operator-ui
-
-- click ```Add```
-
-Close the menu tab
+The operator and all its resources will be installed to namespace ```example-api```, which will be created if necessary
 
 
-Helm / Charts, Search 'postgres', install to the namespace ```example-api```
+### 2. See new Custom Resource Definitions 
 
-- postgres-operator
-
-- postgres-operator-ui with the value of ```targetNamespace``` changed to ```'*'```
-
-Check the changed value from Helm / Releases
-
-
-### 3. See new Custom Resource Definitions 
+**From OpenLens**
 
 Custom Resources / acid.zalan.do / postgresql
 
 
-### 4. Create new PostgreSQL cluster
+### 3. Create new PostgreSQL cluster
+
+**From CLI**
+
+```
+kubectl ns example-api
+cd ~/springboot-api-rest-example/.k8s/10-zalando-postgres-ha-operator
+kubectl apply -f db-crd.yaml
+```
+
+
+### 4. Watch how PostgreSQL cluster is creating in OpenLens 
+
+**From OpenLens**
+
+- Workloads / StatefulSets
+- Custom Resources / acid.zalan.do / postgresql
+
+
+### 5. How PostgreSQL cluster manifest was created? 
+
+**Install ```postgres-operator-ui``` via Helm Chart**
+
+```
+helm repo add postgres-operator-ui-charts https://opensource.zalando.com/postgres-operator/charts/postgres-operator-ui
+helm repo update
+helm upgrade --install --cleanup-on-fail postgres-operator-ui postgres-operator-ui-charts/postgres-operator-ui -f postgres-operator-ui_values.yaml --namespace example-api --create-namespace
+```
+
+**Remark**. 
+Value of ```envs.targetNamespace``` changed to ```'*'``` in the file ```postgres-operator-ui_values.yaml```
+
+
+**Open ```postgres-operator-ui``` in browser**
 
 Network / Services --> namespace: 'example-api', service: 'postgres-operator-ui'
 
@@ -91,25 +104,11 @@ Click 'Validate' in the up-right
 
 See the manifest in the left pane 'Cluster YAML definition'
 
-Click 'Create cluster' in the up-right
-
-The Kubernetes resources will be created
-
-**Remark**. The button 'Edit' in the up-right leads to an edit page 
-where you can edit settings and apply changes without stopping the PostgreSQL cluster 
-
-
-### 5. Watch how Postgres cluster is creating in OpenLens 
-- Workloads / StatefulSets
-- Custom Resources / acid.zalan.do / postgresql
-
 
 ### 6. Install Spring Boot API
 
-Make ```example-api``` active namespace and apply the manifests
 
 ```
-kubectl ns example-api
 kubectl apply -f db-configmap.yaml
 kubectl apply -f api-deployment.yaml
 kubectl apply -f api-service.yaml
@@ -128,54 +127,52 @@ The 'Simple Spring Boot API' page should be opened
 	
 ### 8. Install pgadmin4 via Helm chart 
 
-**From OpenLens**
+**From CLI**
 
-Add Helm Custom Repo, name: ```runix```, URL: ```https://helm.runix.net```
+```
+helm repo add runix https://helm.runix.net
+helm repo update
+helm upgrade --install --cleanup-on-fail pgadmin4 runix/pgadmin4 --namespace pgadmin4 --create-namespace
+helm upgrade --install --cleanup-on-fail pgadmin4 runix/pgadmin4 -f pgadmin4_values.yaml --namespace pgadmin4 --create-namespace
+```
 
-Create namespace ```pgadmin4```
-
-Install [Helm Chart 'pgadmin4'](http://artifacthub.io/packages/helm/runix/pgadmin4) to the namespace ```pgadmin4``` 
-with changed ```env.email``` value to something with domain non-```local```, e.g. ```pgadmin@letmein.org```
-
-**Remark 1**. If the Helm Chart 'pgadmin4' is not seen, hit ```<Ctrl+R>``` (menu 'View-->Reload')
-
-**Remark 2**. The [defalut](https://artifacthub.io/packages/helm/runix/pgadmin4#configuration) value for ```env.email``` is ```chart@example.local```. 
-It has domain ```local```, which is considered by pgadmin as non-safe, so pgdamin doesn't start
+**Remark**.
+The [defalut](https://artifacthub.io/packages/helm/runix/pgadmin4#configuration) value for ```env.email``` is ```chart@example.local```. 
+It has domain ```local```, which is considered by pgadmin as non-safe, so pgdamin doesn't start.
+In the file ```pgadmin4_values.yaml``` this value is changed to  ```pgadmin@letmein.org```
 
 
-### 9. Check pgadmin4 ```env.email``` value
+**Check and fix credentials**
 
-Helm / Releases	--> namespace: 'pgadmin4', click on 'pgadmin4-<digital_suffix>'
+Helm / Releases --> namespace: 'pgadmin4'
 
-Right pane with installation properties will be opened
+Click on 'pgadmin4'
 
-See 'Values' section on the right pane 
+On the left pane, in 'Values' field, check that the value of ```env.email```  
+is ```pgadmin@letmein.org```
+
+Fix the value of ```env.password``` (e.g. copy to clipboard)
+
 
 **Remark**. If there are shown the values from previous Postgres operator, 
 check and uncheck several times 'User-supplied values only'. 
-It's a possibly a bug in OpenLens 
-
-Find ```env:``` section with the field in it ```email: pgadmin@letmein.org```
-
-Fix also ```password``` from this section 
+It's possibly a bug in OpenLens 
 
 
-### 10. Open pgadmin4 web console on local machine
+### 9. Open pgadmin4 web console on local machine
 
-Network / Services --> namespace: 'pgadmin4', click on 'pgadmin4-<digital_suffix>'
+Network / Services --> namespace: 'pgadmin4', click on 'pgadmin4'
 
 Forward port, open in browser
 
 Log in via ```env.email``` and ```env.password``` values fixed in the previous step
 
 
-### 11. Connect to server
+### 10. Connect to server
 
 **From OpenLens**
 
-Config /Secrets --> namespace: 'example-api', click on 'postgres.<postgres_cluster_name>' (with the name os the Postgres cluster)
-
-(postgres_cluster_name: ```acid-pg-demo``` in our example, it can be seen via Services)
+Config /Secrets --> namespace: 'example-api', click on 'postgres.<suffix>' (with the name os the Postgres cluster)
 
 Fix username, password, full DNS name of the service
 (```acid-pg-demo.example-api.svc.cluster.local``` in our example) 
@@ -190,8 +187,8 @@ Use the fixed username, password, full DNS name
 ## Cleanup
 
 ```
-kubectl delete namespace example-api
 kubectl delete namespace pgadmin4
+kubectl delete namespace example-api
 ```
 
 
