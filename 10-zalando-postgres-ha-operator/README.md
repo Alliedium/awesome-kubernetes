@@ -40,10 +40,9 @@ The operator and all its resources will be installed to namespace ```example-api
 
 ### 2. See new Custom Resource Definitions 
 
-**From OpenLens**
-
-Custom Resources / acid.zalan.do / postgresql
-
+```
+kubectl -n example-api get crds
+```
 
 ### 3. Create new PostgreSQL cluster
 
@@ -56,15 +55,16 @@ kubectl apply -f db-crd.yaml
 ```
 
 
-### 4. Watch how PostgreSQL cluster is creating in OpenLens 
+### 4. Watch how PostgreSQL cluster is creating
 
-**From OpenLens**
+```
+kubectl -n example-api get statefulsets
+kubectl -n example-api get pods
+kubectl -n example-api get pvc
+```
 
-- Workloads / StatefulSets
-- Custom Resources / acid.zalan.do / postgresql
 
-
-### 5. How PostgreSQL cluster manifest was created? 
+### 5. Look at PostgreSQL cluster manifest via Postgres Operator UI 
 
 **Install ```postgres-operator-ui``` via Helm Chart**
 
@@ -86,21 +86,9 @@ Forward port, open in browser the web console
 
 **From browser on local machine**
 
-Go to Tab 'New cluster', fillout the fields
+Go to Tab 'PostgreSQL clusters'
 
-	Name: pg-demo
-	Namespace: choose 'example-api' (available because of targetNamespace: '*' for the ui)
-	Owning team: leave the default 'acid', it will be a prefix for Kubernetes resources names
-	Number of instances: 3
-	Master load balancer: uncheck 
-	Replica load balancer: uncheck
-	Enable connection pool: check
-	Volume size: 1 (GiB)
-	+ Users: testuser
-	+ Databases: testdb
-	Resources: 100,500,100,1000
-
-Click 'Validate' in the up-right
+Click at 'acid-pg-demo'
 
 See the manifest in the left pane 'Cluster YAML definition'
 
