@@ -23,7 +23,7 @@ kubectl get nodes
 ```
 helm repo add postgres-operator-charts https://opensource.zalando.com/postgres-operator/charts/postgres-operator
 helm repo update
-helm upgrade --install --cleanup-on-fail postgres-operator postgres-operator-charts/postgres-operator --namespace example-api --create-namespace
+helm upgrade --install --cleanup-on-fail postgres-operator postgres-operator-charts/postgres-operator --namespace example-api --create-namespace --wait
 ```
 
 The operator and all its resources will be installed to namespace ```example-api```, which will be created if necessary
@@ -31,29 +31,43 @@ The operator and all its resources will be installed to namespace ```example-api
 
 ### 2. See new Custom Resource Definitions 
 
+**From CLI**
+
 ```
-kubectl -n example-api get crds
+kubectl ns example-api
+kubectl get crds
 ```
+
+**From OpenLens**
+
+Custom Resources / acid.zalan.do / postgresql
+
 
 ### 3. Create new PostgreSQL cluster
 
 **From CLI**
 
 ```
-kubectl ns example-api
-cd ~/springboot-api-rest-example/.k8s/10-zalando-postgres-ha-operator
 kubectl apply -f db-crd.yaml
 ```
 
 
 ### 4. Watch how PostgreSQL cluster is creating
 
+**From CLI**
+
 ```
-kubectl -n example-api get statefulsets
-kubectl -n example-api get pods
-kubectl -n example-api get pvc
+kubectl get statefulsets
+kubectl get pods
+kubectl get pvc
 ```
 
+**From OpenLens**
+
+- Workloads / StatefulSets
+- Workloads / Pods
+- Storage / Persistent Volume Claims
+- Custom Resources / acid.zalan.do / postgresql
 
 ### 5. Look at PostgreSQL cluster manifest via Postgres Operator UI 
 
@@ -62,7 +76,7 @@ kubectl -n example-api get pvc
 ```
 helm repo add postgres-operator-ui-charts https://opensource.zalando.com/postgres-operator/charts/postgres-operator-ui
 helm repo update
-helm upgrade --install --cleanup-on-fail postgres-operator-ui postgres-operator-ui-charts/postgres-operator-ui -f postgres-operator-ui_values.yaml --namespace example-api --create-namespace
+helm upgrade --install --cleanup-on-fail postgres-operator-ui postgres-operator-ui-charts/postgres-operator-ui -f postgres-operator-ui_values.yaml --namespace example-api --create-namespace --wait
 ```
 
 **Remark**. 
@@ -83,6 +97,7 @@ Click at 'acid-pg-demo'
 
 See the manifest in the left pane 'Cluster YAML definition'
 
+**Remark**. From the tab 'New cluster' one can create new PostgreSQL cluster instead of applying manifest from CLI (Step 3)
 
 ### 6. Install Spring Boot API
 
@@ -111,8 +126,7 @@ The 'Simple Spring Boot API' page should be opened
 ```
 helm repo add runix https://helm.runix.net
 helm repo update
-helm upgrade --install --cleanup-on-fail pgadmin4 runix/pgadmin4 --namespace pgadmin4 --create-namespace
-helm upgrade --install --cleanup-on-fail pgadmin4 runix/pgadmin4 -f pgadmin4_values.yaml --namespace pgadmin4 --create-namespace
+helm upgrade --install --cleanup-on-fail pgadmin4 runix/pgadmin4 -f pgadmin4_values.yaml --namespace pgadmin4 --create-namespace --wait
 ```
 
 **Remark**.
