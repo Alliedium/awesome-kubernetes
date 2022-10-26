@@ -147,17 +147,15 @@ It has domain ```local```, which is considered by pgadmin as non-safe, so pgdami
 In the file ```pgadmin4_values.yaml``` this value is changed to  ```pgadmin@letmein.org```
 
 
-**Check and fix credentials**
+**Check credentials**
 
 Helm / Releases --> namespace: 'pgadmin4'
 
 Click on 'pgadmin4'
 
-On the left pane, in 'Values' field, check that the value of ```env.email```  
-is ```pgadmin@letmein.org```
-
-Fix the value of ```env.password``` (e.g. copy to clipboard)
-
+On the left pane, in 'Values' field, check that the value of 
+- ```env.email``` is ```pgadmin@letmein.org```
+- ```env.password``` is ```123```
 
 **Remark**. If there are shown the values from previous Postgres operator, 
 check and uncheck several times 'User-supplied values only'. 
