@@ -35,6 +35,7 @@ kubectl get nodes
 helm repo add postgres-operator-charts https://opensource.zalando.com/postgres-operator/charts/postgres-operator
 helm repo update
 helm upgrade --install --cleanup-on-fail postgres-operator postgres-operator-charts/postgres-operator --namespace example-api --create-namespace --set configKubernetes.enable_pod_antiaffinity=true --wait
+kubectl ns example-api
 ```
 
 The operator and all its resources will be installed to namespace ```example-api```, which will be created if necessary
@@ -45,7 +46,6 @@ The operator and all its resources will be installed to namespace ```example-api
 **From CLI**
 
 ```
-kubectl ns example-api
 kubectl get crds
 ```
 
