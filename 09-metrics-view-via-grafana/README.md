@@ -17,7 +17,7 @@ kubectl delete namespace example-api
 yay -S helm --noconfirm
 ```
 
-Otherwise, see [intallation instructions](https://helm.sh/docs/intro/install/)
+Otherwise, see [installation instructions](https://helm.sh/docs/intro/install/)
 
 
 ## Steps
