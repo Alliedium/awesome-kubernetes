@@ -18,11 +18,11 @@ docker push localhost:12345/example-api:0.1.0
 
 | Example | Details |
 |------|-------|
-| [Example 1](./1-single-pod-with-ephemeral-volume) | Single pod with sidecar, no persistence due to ephemeral volume |
-| [Example 2](./2-pods-with-ephemeral-volume) | Only pods, no persistence due to ephemeral volume |
-| [Example 3](./3-services-with-pvc) | Added services and persistence via PVC |
-| [Example 4](./4-replicasets-readiness-liveness) | ReplicaSets, Readiness and Liveness probes |
-| [Example 5](./5-deployment-statefulset-configmap-secret) | Deployment, StatefulSet, ConfigMap, Secret |
+| [Example 1](./01-single-pod-with-ephemeral-volume) | Single pod with sidecar, no persistence due to ephemeral volume |
+| [Example 2](./02-pods-with-ephemeral-volume) | Only pods, no persistence due to ephemeral volume |
+| [Example 3](./03-services-with-pvc) | Added services and persistence via PVC |
+| [Example 4](./04-replicasets-readiness-liveness) | ReplicaSets, Readiness and Liveness probes |
+| [Example 5](./05-deployment-statefulset-configmap-secret) | Deployment, StatefulSet, ConfigMap, Secret |
 
 ## Remarks concerning secrets
 
@@ -43,18 +43,18 @@ Both examples below assume that the [Example 5](./5-deployment-statefulset-confi
 
 | Example | Details |
 |------|-------|
-| [Example 6](./6-job-with-minio) | Simple job with Minio S3 storage |
-| [Example 7](./7-cronjob-with-aws-s3) | CronJob with AWS S3 storage |
+| [Example 6](./06-job-with-minio) | Simple job with Minio S3 storage |
+| [Example 7](./07-cronjob-with-aws-s3) | CronJob with AWS S3 storage |
 
 # 4. Installing useful tools in Kubernetes
 
 | Example | Details |
 |------|-------|
-| [Example 8](./8-pgadmin) | Installing pgAdmin |
+| [Example 8](./08-pgadmin) | Installing pgAdmin |
 
 # 5. Using aready existing Helm charts and operators
 
 | Example | Details |
 |------|-------|
-| [Example 9](./9-metrics-view-via-grafana) | Installing PostgreSQL with metrics view via Grafana |
+| [Example 9](./09-metrics-view-via-grafana) | Installing PostgreSQL with metrics view via Grafana |
 | [Example 10](./10-zalando-postgres-ha-operator) | Installing scalable PostgreSQL via Kubernetes operator |
