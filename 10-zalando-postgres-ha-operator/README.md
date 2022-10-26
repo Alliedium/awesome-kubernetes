@@ -144,7 +144,7 @@ helm upgrade --install --cleanup-on-fail pgadmin4 runix/pgadmin4 -f pgadmin4_val
 ```
 
 **Remark**.
-The [defalut](https://artifacthub.io/packages/helm/runix/pgadmin4#configuration) value for ```env.email``` is ```chart@example.local```. 
+The [default](https://artifacthub.io/packages/helm/runix/pgadmin4#configuration) value for ```env.email``` is ```chart@example.local```. 
 It has domain ```local```, which is considered by pgadmin as non-safe, so pgdamin doesn't start.
 In the file ```pgadmin4_values.yaml``` this value is changed to  ```pgadmin@letmein.org```
 
