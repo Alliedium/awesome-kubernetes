@@ -72,6 +72,7 @@ kubectl get pods
 kubectl get pvc
 kubectl get crd postgresqls.acid.zalan.do -o go-template="{{.spec.names.kind}}  {{.spec.names.plural}} "
 kubectl get postgresql
+kubectl describe postgresql acid-pg-demo
 ```
 
 **From OpenLens**
