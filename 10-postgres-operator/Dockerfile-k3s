@@ -1,0 +1,15 @@
+ARG ALPINE_VERSION
+ARG K3S_VERSION
+FROM ${ALPINE_VERSION} as base
+RUN apk add -U open-iscsi
+# /etc/iscsi
+# /lib/
+# /usr/lib
+# /usr/sbin/iscsi*
+
+ARG K3S_VERSION
+FROM rancher/k3s:${K3S_VERSION}
+COPY --from=base /etc/iscsi /etc/iscsi
+COPY --from=base /lib /lib
+COPY --from=base /usr/lib /usr/lib
+COPY --from=base /usr/sbin/iscsi* /sbin/iscsi* /usr/sbin/

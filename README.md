@@ -39,7 +39,7 @@ For more details see [Good practices for Kubernetes Secrets](https://kubernetes.
 
 # 3. Backup jobs configuration variants
 
-Both examples below assume that the [Example 5](./5-deployment-statefulset-configmap-secret) is already deployed and not cleaned up from the cluster.
+Both examples below assume that the [Example 5](./05-deployment-statefulset-configmap-secret) is already deployed and not cleaned up from the cluster.
 
 | Example | Details |
 |------|-------|
