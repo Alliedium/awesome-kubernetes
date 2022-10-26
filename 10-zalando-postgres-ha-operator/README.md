@@ -4,7 +4,7 @@
 
 Please follow the steps from [Prerequisites](../README.md#prerequisites) prior to executing the commands below. Besides,
 
-Delete the namespace ```example-api``` in the case it exists
+- Delete the namespace ```example-api``` in the case it exists
 ```
 kubectl delete namespace example-api
 ```
