@@ -8,6 +8,16 @@
 k3d node create demo-agent -c demo --replicas 2
 ```
 
+**Remark**.
+One can create a new cluster with three server nodes for this example instead of adding two agent nodes as describbed above. To do this, one can run the command
+
+```
+k3d cluster create demo-10 -s 3 --k3s-arg "--no-deploy=traefik@server:*" --registry-create demo-registry:0.0.0.0:102345 --port 1080:8080@loadbalancer
+```
+
+In contrast to the existing demo cluster, where [Kubernetes Control Plane](https://kubernetes.io/docs/concepts/overview/components/) is only on one node, the new cluster will have Kubernetes Control Plane on all nodes.
+
+
 - Get the cluster nodes
 
 ```
@@ -60,6 +70,8 @@ kubectl apply -f db-crd.yaml
 kubectl get statefulsets
 kubectl get pods
 kubectl get pvc
+kubectl get crd postgresqls.acid.zalan.do -o go-template="{{.spec.names.kind}}  {{.spec.names.plural}} "
+kubectl get postgresql
 ```
 
 **From OpenLens**
