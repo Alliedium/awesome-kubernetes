@@ -38,7 +38,7 @@ helm upgrade --install --cleanup-on-fail postgres-operator postgres-operator-cha
 kubectl ns example-api
 ```
 
-The operator and all its resources will be installed to namespace ```example-api```, which will be created if necessary
+The operator and all its resources will be installed to namespace ```example-api```, which will be created if necessary. This namespace is then made active.
 
 
 ### 2. See new Custom Resource Definitions 
