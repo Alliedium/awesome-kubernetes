@@ -168,7 +168,7 @@ Network / Services --> namespace: 'pgadmin4', click on 'pgadmin4'
 
 Forward port, open in browser
 
-Log in via ```env.email``` and ```env.password``` values fixed in the previous step
+Log in via ```env.email``` and ```env.password``` values checked in the previous step
 
 
 ### 10. Connect to server
