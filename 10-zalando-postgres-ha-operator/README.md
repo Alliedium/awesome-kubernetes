@@ -2,6 +2,11 @@
 
 ## Prerequisites
 
+Please follow the steps from [Prerequisites](../README.md#prerequisites) prior to executing the commands below. Besides,
+
+Delete the namespace example-api in the case it exists
+kubectl delete namespace example-api
+
 - Add two nodes (agents) to the cluster
 
 ```
