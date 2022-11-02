@@ -151,7 +151,7 @@ The 'Simple Spring Boot API' page should be opened
 **By Helm chart itself**
 
 ```
-helm test springboot-api
+helm test springboot-api --namespace example-api
 ```
 	
 ### 8. Install pgadmin4 via Helm chart 
