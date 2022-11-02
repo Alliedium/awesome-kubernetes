@@ -140,7 +140,7 @@ helm create springboot-api
 
 ### 7. Check Spring Boot API installation
 
-The pod ```api-<suffix>``` in the namespace ```example-api``` should be already running
+The three pods ```springboot-api-<suffix>``` in the namespace ```example-api``` should be already running
 
 **From browser on Local machine**
 
