@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: db-config
-data:
-  DB_HOST: acid-pg-demo
-  DB_PORT: "5432"
-  DB_NAME: testdb

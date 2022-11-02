@@ -122,16 +122,25 @@ See the manifest in the left pane 'Cluster YAML definition'
 
 ### 6. Install Spring Boot API
 
-
 ```
-kubectl apply -f db-configmap.yaml
-kubectl apply -f api-deployment.yaml
-kubectl apply -f api-service.yaml
+helm upgrade --install --cleanup-on-fail springboot-api ./springboot-api --namespace example-api --create-namespace --set service.type=LoadBalancer --wait
+```
+
+**Remark**.
+In fact, we can look at the manifests to be applied beforehand, this is done as follows:
+```
+helm template springboot-api ./springboot-api --namespace example-api --create-namespace --set service.type=LoadBalancer --wait --skip-tests
+```
+If we remove ```--skip-tests``` from the command above, we will see also resources for tests included into the chart itself (see below on how to launch these tests).
+
+In fact, an initial prototype for the Helm chart contained in ```./springboot-api``` folder was created by the command
+```
+helm create springboot-api
 ```
 
 ### 7. Check Spring Boot API installation
 
-Wait until the pod ```api-<suffix>``` in the namespace ```example-api``` is running
+The pod ```api-<suffix>``` in the namespace ```example-api``` should be already running
 
 **From browser on Local machine**
 
@@ -139,6 +148,11 @@ Open the URL ```http://127.0.0.1:7080```
 
 The 'Simple Spring Boot API' page should be opened
 
+**By Helm chart itself**
+
+```
+helm test springboot-api
+```
 	
 ### 8. Install pgadmin4 via Helm chart 
 
@@ -202,7 +216,3 @@ Use the fixed username, password, full DNS name
 kubectl delete namespace pgadmin4
 kubectl delete namespace example-api
 ```
-
-
-
-

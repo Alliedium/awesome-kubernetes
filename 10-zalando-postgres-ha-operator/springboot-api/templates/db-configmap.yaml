@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "springboot-api.fullname" . }}-db-configmap
+  labels:
+    {{- include "springboot-api.labels" . | nindent 4 }}
+data:
+  DB_HOST: {{ .Values.database.host }}
+  DB_PORT: {{ .Values.database.port | quote }}
+  DB_NAME: {{ .Values.database.name }}

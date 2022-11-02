@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "springboot-api.fullname" . }}
+  labels:
+    {{- include "springboot-api.labels" . | nindent 4 }}
+    component: api
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "springboot-api.selectorLabels" . | nindent 6 }}
+      component: api
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "springboot-api.selectorLabels" . | nindent 8 }}
+        component: api
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "springboot-api.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "springboot-api.fullname" . }}-db-configmap
+          env:
+            - name: DB_USERNAME
+              value: {{ .Values.database.user }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.existingPasswordSecret.name }}
+                  key: {{ .Values.database.existingPasswordSecret.key }}
+            - name: DB_URL
+              value: $(DB_HOST):$(DB_PORT)/$(DB_NAME)
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: 
+            - sh
+            - -c
+          args:
+            - "dockerize -wait tcp://$(DB_HOST):$(DB_PORT) -timeout 20s java -jar api.jar"
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            initialDelaySeconds: 120
+            periodSeconds: 120
+            timeoutSeconds: 15
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            initialDelaySeconds: 100
+            periodSeconds: 15
+            timeoutSeconds: 15
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
