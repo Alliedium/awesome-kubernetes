@@ -8,7 +8,7 @@ database:
   host: acid-pg-demo
   port: 5432
   name: testdb
-  user: postgresql
+  user: postgres
   existingPasswordSecret:
     name: postgres.acid-pg-demo.credentials.postgresql.acid.zalan.do
     key: password
