@@ -19,7 +19,7 @@ spec:
     testuser: []
   databases:
     testdb: testuser
-  allowedSourceRanges:
+  allowedSourceRanges: []
     # IP ranges to access your cluster go here
 
   resources:

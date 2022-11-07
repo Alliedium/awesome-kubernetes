@@ -19,11 +19,12 @@ k3d node create demo-agent -c demo --replicas 2
 One can create a new cluster with three server nodes for this example instead of adding two agent nodes as describbed above. To do this, one can run the command
 
 ```
-k3d cluster create demo-10 -s 3 --k3s-arg "--no-deploy=traefik@server:*" --registry-create demo-registry:0.0.0.0:102345 --port 1080:8080@loadbalancer
+k3d cluster create demo-10 -s 3 --k3s-arg "--no-deploy=traefik@server:*" --registry-create demo-10-registry:0.0.0.0:22345 --port 1080:8080@loadbalancer
 ```
 
 In contrast to the demo cluster created in [Prerequisites](../README.md#prerequisites), where [Kubernetes Control Plane](https://kubernetes.io/docs/concepts/overview/components/) is only on one node, the new cluster will have Kubernetes Control Plane on all nodes. 
-Please take into account that while using the latter cluster you need to adjust all the instructions given in [Prerequisites](../README.md#prerequisites) as well as those pointed below by replacing ports ```12345``` and ```7080``` by ```102345``` and ```1080```, respectively.
+Please take into account that while using the latter cluster you need to adjust all the instructions given in [Prerequisites](../README.md#prerequisites) as well as those pointed below by replacing ports ```12345``` and ```7080``` by ```22345``` and ```1080```, respectively,
+as well as `demo-registry:5000` by `demo-10-registry:5000`.
 
 
 - Get the cluster nodes
@@ -66,7 +67,7 @@ Custom Resources / acid.zalan.do / postgresql
 **From CLI**
 
 ```
-kubectl apply -f db-crd.yaml
+kubectl apply -f db-postgresql.acid.zalan.do.yaml
 ```
 
 
