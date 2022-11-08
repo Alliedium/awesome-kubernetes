@@ -225,17 +225,23 @@ Log in via ```env.email``` and ```env.password``` values checked in the previous
 
 **From OpenLens**
 
-Config /Secrets --> namespace: 'example-api', click on 'postgres.<suffix>' (with the name os the Postgres cluster)
+Config / Secrets --> namespace: 'example-api', click on 'postgres.<suffix>' (with the name of the Postgres cluster)
 
-Fix username, password, full DNS name of the service
+Get username, password, full DNS name of the service
 (```acid-pg-demo.example-api.svc.cluster.local``` in our example) 
+
+The password for ```postgres``` user may be taken also by executing the command
+```
+kubectl -n example-api get secret postgres.acid-pg-demo.credentials.postgresql.acid.zalan.do --template='{{.data.password}}' | base64 -d
+```
 
 
 **From pgadmin web console**
 
 Create a new server connection
 
-Use the fixed username, password, full DNS name
+Use username, password, full DNS name obtained above.
+
 
 ## Cleanup
 
