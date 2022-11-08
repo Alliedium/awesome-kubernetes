@@ -52,9 +52,9 @@ Both examples below assume that the [Example 5](./05-deployment-statefulset-conf
 |------|-------|
 | [Example 8](./08-pgadmin) | Installing pgAdmin |
 
-# 5. Using aready existing Helm charts and operators
+# 5. Using aready existing Helm charts and operators, implementing new Helm charts
 
 | Example | Details |
 |------|-------|
 | [Example 9](./09-metrics-view-via-grafana) | Installing PostgreSQL with metrics view via Grafana |
-| [Example 10](./10-zalando-postgres-ha-operator) | Installing scalable PostgreSQL via Kubernetes operator |
+| [Example 10](./10-zalando-postgres-ha-operator) | Installing scalable PostgreSQL via Kubernetes operator, implementing new Helm chart |
