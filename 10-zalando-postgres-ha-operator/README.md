@@ -1,4 +1,4 @@
-# Installing scalable PostgreSQL via Kubernetes operator
+# Installing scalable PostgreSQL via Kubernetes operator, implementing new Helm chart
 
 ## Prerequisites
 
