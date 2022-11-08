@@ -154,8 +154,28 @@ The 'Simple Spring Boot API' page should be opened
 ```
 helm test springboot-api --namespace example-api
 ```
-	
-### 8. Install pgadmin4 via Helm chart 
+
+### 8. Release a new version of Spring Boot API
+
+
+```
+APP_VERSION=0.1.1
+docker build --file ../../api/docker/Dockerfile.prod -t localhost:12345/example-api:${APP_VERSION} ../../api
+docker push localhost:12345/example-api:${APP_VERSION}
+helm package --app-version ${APP_VERSION} --version ${APP_VERSION} ./springboot-api
+helm upgrade --install --cleanup-on-fail springboot-api ./springboot-api-${APP_VERSION}.tgz --namespace example-api --create-namespace --reuse-values --timeout 15m --wait
+```
+
+### 9. Rollback to previous release of Spring Boot API
+
+```
+helm history springboot-api
+helm rollback springboot-api
+rm ./springboot-api-${APP_VERSION}.tgz
+helm history springboot-api
+```
+
+### 10. Install pgadmin4 via Helm chart 
 
 **From CLI**
 
@@ -177,7 +197,6 @@ The [default](https://artifacthub.io/packages/helm/runix/pgadmin4#configuration)
 It has domain ```local```, which is considered by pgadmin as non-safe, so pgdamin doesn't start.
 In the file ```pgadmin4_values.yaml``` this value is changed to  ```pgadmin@letmein.org```
 
-
 **Check credentials**
 
 Helm / Releases --> namespace: 'pgadmin4'
@@ -193,7 +212,7 @@ check and uncheck several times 'User-supplied values only'.
 It's possibly a bug in OpenLens 
 
 
-### 9. Open pgadmin4 web console on local machine
+### 11. Open pgadmin4 web console on local machine
 
 Network / Services --> namespace: 'pgadmin4', click on 'pgadmin4'
 
@@ -202,7 +221,7 @@ Forward port, open in browser
 Log in via ```env.email``` and ```env.password``` values checked in the previous step
 
 
-### 10. Connect to server
+### 12. Connect to server
 
 **From OpenLens**
 
