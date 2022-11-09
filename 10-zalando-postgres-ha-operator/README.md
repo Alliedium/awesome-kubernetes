@@ -1,4 +1,4 @@
-# Installing scalable PostgreSQL via Kubernetes operator, implementing new Helm chart
+# Installing scalable PostgreSQL via Kubernetes operator, implementing Helm chart for Spring Boot API application
 
 ## Prerequisites
 
