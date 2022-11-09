@@ -57,4 +57,4 @@ Both examples below assume that the [Example 5](./05-deployment-statefulset-conf
 | Example | Details |
 |------|-------|
 | [Example 9](./09-metrics-view-via-grafana) | Installing PostgreSQL with metrics view via Grafana |
-| [Example 10](./10-zalando-postgres-ha-operator) | Installing scalable PostgreSQL via Kubernetes operator, implementing new Helm chart |
+| [Example 10](./10-zalando-postgres-ha-operator) | Installing scalable PostgreSQL via Kubernetes operator, implementing Helm chart for Spring Boot API application |
