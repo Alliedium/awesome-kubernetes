@@ -155,7 +155,7 @@ The 'Simple Spring Boot API' page should be opened
 helm test springboot-api --namespace example-api
 ```
 
-### 8. Release a new version of Spring Boot API
+### 8. Release new version of Spring Boot API
 
 
 ```
