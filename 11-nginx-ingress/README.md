@@ -34,7 +34,7 @@ kubectl --namespace nginx-ingress get services -o wide -w nginx-ingress-ingress-
 Let us add two following records to `/etc/hosts` file on Manjaro VM
 ```
 10.150.0.50 hello-http-0.devops-ingress-0.intranet
-10.150.0.50 hello-http-0.devops-ingress-0.intranet
+10.150.0.50 hello-http-1.devops-ingress-0.intranet
 ```
 so that we can reach our NGINX Ingress controller IP using two different
 DNS names.
