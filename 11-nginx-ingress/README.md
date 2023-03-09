@@ -67,7 +67,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: hello-http-0-ingress
-  namespace: nginx-ingress-exp 
 spec:
   ingressClassName: nginx
   rules:
@@ -92,7 +91,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: hello-http-1-ingress
-  namespace: nginx-ingress-exp 
 spec:
   ingressClassName: nginx
   rules:
