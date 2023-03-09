@@ -2,7 +2,7 @@
 We assume that
 - All kubectl commands are executed from Manjaro Linux VM
 - Kubernetes cluster is set up via
-https://github.com/techno-tim/k3s-ansible Ansible playbook according to https://github.com/Alliedium/devops-course-2022/tree/main/40_setting_up_production_like_kubernetes_cluster_part_5_15_dec_2022
+https://github.com/techno-tim/k3s-ansible Ansible playbook according to https://github.com/Alliedium/awesome-devops/tree/main/40_setting_up_production_like_kubernetes_cluster_part_5_15_dec_2022
 with MetalLB and KubeVIP installed.
 - MetalLB is configured to allocate IP addresses from 10.150.0.40 - 10.150.0.60 range
   and these IP addresses are reachable from both Manjaro VM and our
