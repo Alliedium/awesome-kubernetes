@@ -165,6 +165,60 @@ PUBLIC IP: 9443 -> INGRESS CONTROLLER IP: 443
 We assume that INGRESS CONTROLLER IP is `10.150.0.50` (the same as in the
 previous example). In your case it might be different.
 
+### Create Ingress instances for accessing backend services via HTTP
+Make sure that current namespace is `nginx-ingress-example-2`:
+```
+kubectl config set-context --current --namespace=nginx-ingress-example-2
+```
+and then run
+
+```
+cat <<EOF | kubectl apply -f -                 
+apiVersion: networking.k8s.io/v1
+kind: Ingress      
+metadata:
+  name: hello-http-0-ingress
+spec:
+  ingressClassName: nginx
+  rules:                        
+    - host: nginx0-manjaro.devopshive.link                        
+      http:             
+        paths:                            
+          - pathType: Prefix
+            backend:
+              service:
+                name: hello-http-0-svc
+                port:
+                  number: 80
+            path: /        
+          
+EOF
+```
+and
+
+```
+cat <<EOF | kubectl apply -f -                 
+apiVersion: networking.k8s.io/v1
+kind: Ingress      
+metadata:
+  name: hello-http-1-ingress
+spec:
+  ingressClassName: nginx
+  rules:                        
+    - host: nginx1-manjaro.devopshive.link                        
+      http:             
+        paths:                            
+          - pathType: Prefix
+            backend:
+              service:
+                name: hello-http-1-svc
+                port:
+                  number: 80
+            path: /        
+          
+EOF
+```
+
 ### Check availability of backend services via HTTP:
 
 If all the configuration in the sections above is performed correctly
@@ -462,3 +516,16 @@ curl -vkI https://nginx2-manjaro.devopshive.link:9443
 - https://www.nginx.com/blog/automating-multi-cluster-dns-with-nginx-ingress-controller/
 - https://www.nginx.com/blog/implementing-openid-connect-authentication-kubernetes-okta-and-nginx-ingress-controller/#Creating-SSO-Integrations-for-Multiple-Apps
 - https://docs.giantswarm.io/advanced/ingress/configuration/
+- https://github.com/techno-tim/k3s-ansible
+- https://github.com/Alliedium/awesome-devops/tree/main/40_setting_up_production_like_kubernetes_cluster_part_5_15_dec_2022
+- https://github.com/Alliedium/springboot-api-rest-example/tree/master/.k8s
+- https://github.com/Alliedium/awesome-nginx#register-a-new-domain-using-route53
+- https://github.com/Alliedium/awesome-nginx#expose-ports-8443-and-8080-on-nginx-host-to-internet
+- https://cert-manager.io/docs/installation/helm/
+- https://cert-manager.io/docs/installation/verify/
+- https://github.com/Alliedium/awesome-devops/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md
+- https://cert-manager.io/docs/configuration/acme/dns01/route53/#set-up-an-iam-role
+- https://letsencrypt.org/docs/staging-environment/
+- https://letsencrypt.org/docs/rate-limits/
+- https://cert-manager.io/docs/concepts/issuer/
+- https://kubernetes.github.io/ingress-nginx/user-guide/tls/#default-ssl-certificate
