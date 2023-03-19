@@ -1,5 +1,12 @@
 # 1. Prerequisites
 
+- Clone this repository and pull all submodules
+```
+git clone https://github.com/Alliedium/awesome-kubernetes.git
+git submodule init
+git submodule update
+```
+
 - Create a cluster with a registry
 
 ```
@@ -10,7 +17,8 @@ k3d cluster create demo --k3s-arg "--no-deploy=traefik@server:*" --registry-crea
 
 
 ```
-docker build --file ../api/docker/Dockerfile.prod -t localhost:12345/example-api:0.1.0 ../api
+cd ./external/springboot-api-rest-example/
+docker build --file ./api/docker/Dockerfile.prod -t localhost:12345/example-api:0.1.0 ./api
 docker push localhost:12345/example-api:0.1.0
 ```
 
@@ -58,3 +66,9 @@ Both examples below assume that the [Example 5](./05-deployment-statefulset-conf
 |------|-------|
 | [Example 9](./09-metrics-view-via-grafana) | Installing PostgreSQL with metrics view via Grafana |
 | [Example 10](./10-zalando-postgres-ha-operator) | Installing scalable PostgreSQL via Kubernetes operator, implementing Helm chart for Spring Boot API application |
+
+# 6. Ingress
+
+| Example | Details |
+|------|-------|
+| [Example 11](./11-nginx-ingress) | NGINX Ingress examples |
