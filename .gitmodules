@@ -1,4 +1,4 @@
-[submodule "external/springboot-api-rest-example"]
+[submodule "springboot-api-rest-example"]
 	path = external/springboot-api-rest-example
-	url = git@github.com:Alliedium/springboot-api-rest-example.git
+	url = https://github.com/Alliedium/springboot-api-rest-example.git
 	ignore = dirty
