@@ -13,8 +13,7 @@ git submodule update
 k3d cluster create demo --k3s-arg "--no-deploy=traefik@server:*" --registry-create demo-registry:0.0.0.0:12345 --port 7080:8080@loadbalancer
 ```
 
-- Build and push a Docker image (it is assumed that current folder is `.k8s`)
-
+- Build and push a Docker image
 
 ```
 cd ./external/springboot-api-rest-example/

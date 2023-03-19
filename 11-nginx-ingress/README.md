@@ -9,8 +9,9 @@ with MetalLB and KubeVIP installed.
   home lab router.
 - Our home lab router is reachable from Internet via at least single public IP address
   allocated to us by our internet provider 
-- All the tools used in examples from https://github.com/Alliedium/springboot-api-rest-example/tree/master/.k8s
-are installed
+- All Kubernetes tools described in
+  https://github.com/Alliedium/awesome-devops/tree/main/11_k8s_dev_tools_kubectl_krew_vscode_15-sep-2022
+  are installed
 
 ## 1. Exposing service via HTTP mode within intranet 
 ### Install NGINX Ingress controller via Helm
