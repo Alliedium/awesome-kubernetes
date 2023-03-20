@@ -510,6 +510,280 @@ curl -vkI https://nginx0-manjaro.devopshive.link:9443
 curl -vkI https://nginx1-manjaro.devopshive.link:9443
 curl -vkI https://nginx2-manjaro.devopshive.link:9443
 ```
+## 3. Synchronizing Ingresses with Route53 automatically via External-DNS
+
+### Assumptions
+We assume that Cert Manager is installed and configured according to
+instructions in the previous example. We also assume that 
+ backend services (and pods) are created in `nginx-ingress-example-3`
+namespace:
+
+```
+kubectl create ns nginx-ingress-example-3
+kubectl config set-context --current --namespace=nginx-ingress-example-3
+
+kubectl run hello-http-0 --image=nginxdemos/hello --port=80
+kubectl run hello-http-1 --image=nginxdemos/hello --port=80
+
+kubectl expose pods hello-http-0 --name hello-http-0-svc
+kubectl expose pods hello-http-1 --name hello-http-1-svc
+```
+### High Level Picture
+This example is built on top of the previous example and adds
+integration of NGINX Ingress Controller with External-DNS (see
+https://github.com/kubernetes-sigs/external-dns) and Route53
+(https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md). The purpose of this
+integration is to enable an automatic synchronization of Ingresses with
+Route53 Records Sets and Hosted Zone so that when we create an new (or
+delete an existing)
+Ingress the corresponding record in Hosted Zone is created (deleted)
+automatically. This, combined with Cert Manager, significantly
+simplifies exposing Kubernetes services to Internet as all we need
+to do to make a service publicly available via HTTPS is to create an
+Ingress pointing to that service. Both Cert Manager and External DNS
+will take care of the rest. 
+
+
+### Configuring programmatic access from Kubernetes to Route53
+As in the previous example we will require IAM account with programmatic
+access. This account will have to have the following policy attached:
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "route53:GetChange",
+            "Resource": "arn:aws:route53:::change/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "route53:ChangeResourceRecordSets",
+                "route53:ListResourceRecordSets"
+            ],
+            "Resource": "arn:aws:route53:::hostedzone/YOUR-HOSTED-ZONE-ID"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "route53:ListHostedZones"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+where `YOUR-HOSTED-ZONE-ID` needs be be replaced with your Route53 Hosted Zone
+ID (see
+https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md#iam-policy).
+This policy is very similar to the policy from the previous example
+(with the exception that it allows allows listing hosted zones).
+
+We will also require a special namespace `external-dns` (where we will
+install External DNS):
+```
+kubectl create namespace external-dns
+```
+and a secret created with programmatic access keys
+
+```
+kubectl create secret generic external-dns \                                                                            
+    --from-literal=secret-access-key='YOUR-SECRET-ACCESS-KEY' --from-literal=aws_access_key_id='YOUR-ACCESS-KEY-ID'
+```
+where `YOUR-SECRET-ACCESS-KEY` and `YOUR-ACCESS-KEY-ID` need to be
+replaced with programmatic access key and key id.
+
+### Installing External DNS
+The official documentation of Exteranl DNS suggests that we install it
+via applying Kubernetes manifest for Deployment directly (see
+https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md#manifest-for-clusters-without-rbac-enabled).
+
+However, in this example we will install External DNS via Helm Chart by
+Bitnami (see https://artifacthub.io/packages/helm/bitnami/external-dns).
+
+As the first step we need to add Bitnami Helm repository:
+```
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+```
+and then use Helm to install External DNS into `external-dns` namespace:
+
+
+```
+helm upgrade --install  external-dns \                                                                                  
+  --namespace external-dns --create-namespace \
+  --set provider=aws \
+  --set aws.zoneType=public \
+  --set txtOwnerId=YOUR-HOSTED-ZONE-ID \
+  --set policy=sync \
+  --set "domainFilters[0]=devopshive.link" \
+  --set aws.credentials.accessKeyIDSecretRef.name=external-dns \
+  --set aws.credentials.accessKeyIDSecretRef.key=aws_access_key_id \
+  --set aws.credentials.secretAccessKeySecretRef.name=external-dns \
+  --set aws.credentials.secretAccessKeySecretRef.key=secret-access-key \
+  bitnami/external-dns \
+  --cleanup-on-fail
+```
+where
+`YOUR-HOSTED-ZONE-ID` needs to be replaced by your Hosted Zone ID and
+`devopshive.link` - by your domain name.
+
+The command above sets the following parameters:
+- `provider=aws` - as we use Route53 (even though support for other
+  providers is available - see
+  https://github.com/kubernetes-sigs/external-dns#the-latest-release).
+- `aws.zoneType=public` - our `devopshive.link` hosted zone is public
+  because we expose our Kubernetes services to Internet. 
+- `policy=sync` - we want add records to Route53 when we create
+  Ingresses, delete records as we delete Ingresses and update records as
+  we update Ingresses. Sometimes you might want to use `upsert-only`
+  policy instead (which prohibits Route53 record deletion). 
+- `domainFilters[0]=devopshive.link` - we want External DNS to track
+  only `devopshive.link` subdomain, its subdomains and nothing else.
+- 4 `*SecretRef` parameters specify location of secret (and keys inside
+  that secret) where programmatic access credentials for Route53 are
+  located. We created that secrets in one of the sections above.
+
+### Creating Ingresses 
+Normally, External DNS is used in the clusters deployed in Cloud
+Provider's infrastructure where services of type "LoadBalancer" are
+automatically given a public external IP. In our case the external IP
+given to services of type "LoadBalancer" are take from the pool of
+internal IP addresses controlled by MetalLB. Thus, when External DNS
+cannot use the external IPs from the services themselves and need to use
+our external public IP given to us by our internet provider (of course,
+here we assume that we do port-forwarding and firewall configuration on
+our home lab router by ourselves). This requires a special handling on our side - we need to let External DNS
+know our true external public IP address. This can be done via adding a
+special annotation to each of the Ingress instances we create:
+```
+external-dns.alpha.kubernetes.io/target: x.x.x.x
+```
+
+where `x.x.x.x` needs to be replaced by public IP address used by your
+router.
+
+Let us define an environment variable `EXTERNAL_IP` containing our
+public IP address:
+```
+export EXTERNAL_IP=x.x.x.x # specify your public IP address here 
+```
+and let us use it when creating Ingresses for `hello-http-0-svc` using
+`letsencrypt-staging` Cluster Issuer (which was configured in the
+previous example):
+
+```
+cat <<EOF |sed "s/EXTERNAL_IP/$EXTERNAL_IP/g" |kubectl apply -f -
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-http-0-ext-dns-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+    external-dns.alpha.kubernetes.io/target: EXTERNAL_IP
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - nginx0-ext-dns-manjaro.devopshive.link
+    secretName: nginx0-ext-dns-devopshive-tls
+  rules:
+    - host: nginx0-ext-dns-manjaro.devopshive.link
+      http:
+        paths:
+          - pathType: Prefix
+            backend:
+              service:
+                name: hello-http-0-svc
+                port:
+                  number: 80
+            path: /
+
+EOF
+```
+and Ingress for `hello-http-1-svc` service using `letsencrypt-prod` Cluster
+Issuer: 
+```
+cat <<EOF |sed "s/EXTERNAL_IP/$EXTERNAL_IP/g" |kubectl apply -f -
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-http-1-ext-dns-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    external-dns.alpha.kubernetes.io/target: EXTERNAL_IP
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - nginx1-ext-dns-manjaro.devopshive.link
+    secretName: nginx1-ext-dns-devopshive-tls
+  rules:
+    - host: nginx1-ext-dns-manjaro.devopshive.link
+      http:
+        paths:
+          - pathType: Prefix
+            backend:
+              service:
+                name: hello-http-1-svc
+                port:
+                  number: 80
+            path: /
+
+EOF
+```
+External DNS reacts to appearance of new Ingress instances quite promptly 
+while it might take up to 2-3 minutes for certificates to be issued by
+Cert Manager. 
+
+### Testing access from outside
+If you try to run 
+```
+w3m https://nginx0-ext-dns-manjaro.devopshive.link:9443 -dump
+```
+or
+```
+w3m https://nginx1-ext-dns-manjaro.devopshive.link:9443 -dump
+```
+right after creating Ingresses you might see the following errors:
+- `w3m: Can't load https://nginx1-ext-dns-manjaro.devopshive.link:9443`
+  - this means that External DNS has not yet added "A" record to your
+  hosted zone. If you are inpatient you can go to AWS web console and
+  periodically update the Resource Record Set for your hosted zone to
+  watch the new records being created. Alternatively you can run the
+  following command (replace `YOUR-HOSTED-ZONE-ID` with your Hosted Zone
+  ID):
+  ```
+  aws route53  list-resource-record-sets --hosted-zone-id YOUR-HOSTED-ZONE-ID --output json --query "ResourceRecordSets[?Type == 'A']"
+  ```
+
+- `self-signed certificate: accept? (y/n)` - this means that Cert
+  Manager has not yet issued the certificate for us and NGINX Controller
+  uses a fake self-signed certificate as a default. You can run the
+  following commands to wait for certificates to be issued:
+  ```
+  kubectl wait certificates nginx0-ext-dns-devopshive-tls --for condition=Ready --timeout=200s
+  kubectl wait certificates nginx1-ext-dns-devopshive-tls --for condition=Ready --timeout=200s
+  ```
+
+In both cases you just need to wait a bit more. Once certificates are
+ready accessing `hello-http-0-svc` backend service via
+```
+w3m https://nginx0-manjaro.devopshive.link:9443 -dump
+```
+results in `unable to get local issuer certificate` error which can be
+overridden by answering `y` to `accept?` question. This was expected
+because for the first `Ingress` we used LetsEncrypt staging environment
+which doesn't issue real certificates.
+
+Accessing `hello-http-1-svc` via
+```
+w3m https://nginx1-manjaro.devopshive.link:9443 -dump
+```
+works just fine because the second `Ingress` we created with TLS
+certificate issued by LetsEncrypt production environment.
+
 
 ## References
 - https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx 
