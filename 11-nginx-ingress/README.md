@@ -804,3 +804,8 @@ certificate issued by LetsEncrypt production environment.
 - https://letsencrypt.org/docs/rate-limits/
 - https://cert-manager.io/docs/concepts/issuer/
 - https://kubernetes.github.io/ingress-nginx/user-guide/tls/#default-ssl-certificate
+- https://github.com/kubernetes-sigs/external-dns
+- https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md#manifest-for-clusters-without-rbac-enabled
+- https://artifacthub.io/packages/helm/bitnami/external-dns
+- https://github.com/inlets/inlets-operator
+- https://docs.aws.amazon.com/cli/latest/reference/route53/list-resource-record-sets.html
