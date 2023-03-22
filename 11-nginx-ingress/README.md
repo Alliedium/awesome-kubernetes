@@ -784,6 +784,30 @@ w3m https://nginx1-manjaro.devopshive.link:9443 -dump
 works just fine because the second `Ingress` we created with TLS
 certificate issued by LetsEncrypt production environment.
 
+## Limitations of External DNS
+External DNS doesn't support IPv6 just yet (see
+https://github.com/kubernetes-sigs/external-dns/pull/2461).
+
+## Limitations of Ingress
+### Lack of support for TCP and UDP services
+We cannot use port `8443` that we exposed on NGINX Ingress Controller
+for HTTPS for neither TCP or UDP (see https://kubernetes.github.io/ingress-nginx/user-guide/exposing-tcp-udp-services/).
+There are multiple ways to mitigate that:
+
+- Expose additional ports
+In order to make a TCP or UDP service available via Ingress in our case we would
+have to expose additional ports on our home lab router and forward those
+ports to IP `10.150.0.50` (which is IP allocated by MetalLB to our NGINX
+Ingress controller).
+
+- Use the tool called Inlets (see https://docs.inlets.dev/reference/inlets-operator/) that is capable of provisioning VM with public IP in the cloud and use
+that VM to tunnel traffic back to Ingress Controller. Inlets replaces
+MetalLB so that latter would have to be removed.
+
+- Use Kubernetes cluster deployed in the cloud (AWS EKS for instance).
+  This would allow to use external load balances managed by cloud
+  providers to allocate public external IPs to services and Ingress
+  Controllers. 
 
 ## References
 - https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx 
@@ -809,3 +833,4 @@ certificate issued by LetsEncrypt production environment.
 - https://artifacthub.io/packages/helm/bitnami/external-dns
 - https://github.com/inlets/inlets-operator
 - https://docs.aws.amazon.com/cli/latest/reference/route53/list-resource-record-sets.html
+- https://kubernetes.github.io/ingress-nginx/user-guide/exposing-tcp-udp-services/
