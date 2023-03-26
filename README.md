@@ -10,7 +10,7 @@ git submodule update
 - Create a cluster with a registry
 
 ```
-k3d cluster create demo --k3s-arg "--no-deploy=traefik@server:*" --registry-create demo-registry:0.0.0.0:12345 --port 7080:8080@loadbalancer
+k3d cluster create demo --k3s-arg "--disable=traefik@server:*" --registry-create demo-registry:0.0.0.0:12345 --port 7080:8080@loadbalancer
 ```
 
 - Build and push a Docker image
