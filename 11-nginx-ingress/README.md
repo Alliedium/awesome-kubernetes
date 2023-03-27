@@ -588,7 +588,7 @@ kubectl create namespace external-dns
 and a secret created with programmatic access keys
 
 ```
-kubectl create secret generic external-dns \                                                                            
+kubectl create secret generic external-dns --namespace external-dns \                                                                            
     --from-literal=secret-access-key='YOUR-SECRET-ACCESS-KEY' --from-literal=aws_access_key_id='YOUR-ACCESS-KEY-ID'
 ```
 where `YOUR-SECRET-ACCESS-KEY` and `YOUR-ACCESS-KEY-ID` need to be
