@@ -1,4 +1,16 @@
-# 1. Prerequisites
+# Awesome Kubernetes
+Discover the power of Kubernetes with our Git repository, featuring an
+impressive collection of practical and informative examples. Whether
+you're a beginner or a seasoned pro, our repository is the perfect
+resource for exploring the full potential of Kubernetes.
+
+Our examples are carefully curated and designed to be clear, concise,
+and easy to follow, providing an exceptional learning experience for
+all. From containerized application deployments to complex
+microservices, our repository showcases a wide range of use cases and
+scenarios, providing invaluable insight into the world of Kubernetes.
+
+## 1. Prerequisites
 
 - Clone this repository and pull all submodules
 ```
@@ -21,7 +33,7 @@ docker build --file ./api/docker/Dockerfile.prod -t localhost:12345/example-api:
 docker push localhost:12345/example-api:0.1.0
 ```
 
-# 2. Deployment variants
+## 2. Deployment variants
 
 | Example | Details |
 |------|-------|
@@ -31,7 +43,7 @@ docker push localhost:12345/example-api:0.1.0
 | [Example 4](./04-replicasets-readiness-liveness) | ReplicaSets, Readiness and Liveness probes |
 | [Example 5](./05-deployment-statefulset-configmap-secret) | Deployment, StatefulSet, ConfigMap, Secret |
 
-## Remarks concerning secrets
+### Remarks concerning secrets
 
 For the last example above as well as for some examples below we use manifests for [Kubernetes Secrets](https://kubernetes.io/docs/concepts/configuration/secret/). And secret values in these manifests are hard coded. But this is just for simplicity, i.e. it is not how secrets are to be handled in real production. The reason is that these hard coded values can be seen by any person having access to respective Git repository which contradicts with an idea of secrets being a secret. 
 
@@ -44,7 +56,7 @@ Both of these approaches allow us to avoid storing original secret values *direc
 
 For more details see [Good practices for Kubernetes Secrets](https://kubernetes.io/docs/concepts/security/secrets-good-practices/) and the blog [How to use AWS Secrets & Configuration Provider with your Kubernetes Secrets Store CSI driver](https://aws.amazon.com/ru/blogs/security/how-to-use-aws-secrets-configuration-provider-with-kubernetes-secrets-store-csi-driver/).
 
-# 3. Backup jobs configuration variants
+## 3. Backup jobs configuration variants
 
 Both examples below assume that the [Example 5](./05-deployment-statefulset-configmap-secret) is already deployed and not cleaned up from the cluster.
 
@@ -53,20 +65,20 @@ Both examples below assume that the [Example 5](./05-deployment-statefulset-conf
 | [Example 6](./06-job-with-minio) | Simple job with Minio S3 storage |
 | [Example 7](./07-cronjob-with-aws-s3) | CronJob with AWS S3 storage |
 
-# 4. Installing useful tools in Kubernetes
+## 4. Installing useful tools in Kubernetes
 
 | Example | Details |
 |------|-------|
 | [Example 8](./08-pgadmin) | Installing pgAdmin |
 
-# 5. Using aready existing Helm charts and operators, implementing new Helm charts
+## 5. Using aready existing Helm charts and operators, implementing new Helm charts
 
 | Example | Details |
 |------|-------|
 | [Example 9](./09-metrics-view-via-grafana) | Installing PostgreSQL with metrics view via Grafana |
 | [Example 10](./10-zalando-postgres-ha-operator) | Installing scalable PostgreSQL via Kubernetes operator, implementing Helm chart for Spring Boot API application |
 
-# 6. Ingress
+## 6. Ingress
 
 | Example | Details |
 |------|-------|
